@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+.DS_Store
+*.log
+.venv/
+*credentials*.json
+*token*.json
+*service-account*.json
+*oauth*.json
+*.pem

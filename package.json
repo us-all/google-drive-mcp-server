@@ -1,0 +1,57 @@
+{
+  "name": "@us-all/google-drive-mcp",
+  "version": "1.0.0",
+  "description": "Google Drive MCP server with Google Workspace awareness — Shared Drives, Labels, Approvals, and domain-wide delegation support",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "google-drive-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/us-all/google-drive-mcp-server.git"
+  },
+  "homepage": "https://github.com/us-all/google-drive-mcp-server#readme",
+  "bugs": "https://github.com/us-all/google-drive-mcp-server/issues",
+  "keywords": [
+    "mcp",
+    "google-drive",
+    "google-workspace",
+    "gws",
+    "shared-drives",
+    "labels",
+    "approvals",
+    "model-context-protocol"
+  ],
+  "author": "us-all",
+  "license": "MIT",
+  "packageManager": "pnpm@10.30.2",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "presmoke": "pnpm run build",
+    "smoke": "node scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "dotenv": "^17.3.1",
+    "googleapis": "^148.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.1"
+  }
+}

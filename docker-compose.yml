@@ -1,0 +1,5 @@
+services:
+  google-drive-mcp:
+    build: .
+    env_file: .env
+    stdin_open: true
