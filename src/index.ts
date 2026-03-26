@@ -88,7 +88,7 @@ import {
 
 const server = new McpServer({
   name: "google-drive",
-  version: "1.0.0",
+  version: "1.0.1",
 });
 
 // ── Universal tools (personal + GWS) ───────────────────────────────────────
