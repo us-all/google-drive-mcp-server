@@ -1049,6 +1049,30 @@ export async function addChart(
   const dataGridRange = parseGridRange(params.dataRange, dataSheetId);
   const anchor = parseCellRef(params.anchorCell ?? "E1");
 
+  // Domain = first column only, Series = remaining columns (one per column)
+  const domainRange = {
+    ...dataGridRange,
+    endColumnIndex: (dataGridRange.startColumnIndex as number) + 1,
+  };
+
+  const startCol = (dataGridRange.startColumnIndex as number) + 1;
+  const endCol = dataGridRange.endColumnIndex as number;
+  const seriesList = [];
+  for (let col = startCol; col < endCol; col++) {
+    seriesList.push({
+      series: {
+        sourceRange: {
+          sources: [{
+            ...dataGridRange,
+            startColumnIndex: col,
+            endColumnIndex: col + 1,
+          }],
+        },
+      },
+      targetAxis: "LEFT_AXIS",
+    });
+  }
+
   const spec: Record<string, unknown> = {
     title: params.title,
     basicChart: {
@@ -1056,12 +1080,9 @@ export async function addChart(
       legendPosition: "BOTTOM_LEGEND",
       headerCount: params.headerCount,
       domains: [{
-        domain: { sourceRange: { sources: [dataGridRange] } },
+        domain: { sourceRange: { sources: [domainRange] } },
       }],
-      series: [{
-        series: { sourceRange: { sources: [dataGridRange] } },
-        targetAxis: "LEFT_AXIS",
-      }],
+      series: seriesList,
     },
   };
 

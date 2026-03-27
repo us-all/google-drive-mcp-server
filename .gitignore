@@ -10,5 +10,6 @@ dist/
 *credentials*.json
 *token*.json
 *service-account*.json
+*client_secret*.json
 *oauth*.json
 *.pem
