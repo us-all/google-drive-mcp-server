@@ -3,7 +3,7 @@
 ## Tech Stack
 - Node.js 18+, pnpm, TypeScript (strict, ESM)
 - `@modelcontextprotocol/sdk` — MCP protocol
-- `googleapis` — Google Drive API v3, Drive Activity API v2, Drive Labels API v2
+- `googleapis` — Google Drive API v3, Drive Activity API v2, Drive Labels API v2, Sheets API v4
 - `zod` — input validation
 - `dotenv` — env loading
 - `vitest` — testing
@@ -41,7 +41,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 - **OAuth2**: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` + `GOOGLE_REFRESH_TOKEN`
 - **Service Account**: `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` + optional `GOOGLE_IMPERSONATE_USER`
 
-## Tool Categories (32 tools)
+## Tool Categories (41 tools)
 
 | File | Tools |
 |------|-------|
@@ -54,6 +54,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 | `revisions.ts` | `list-revisions`, `get-revision` |
 | `about.ts` | `get-about` |
 | `activity.ts` | `get-activity` |
+| `sheets.ts` | `sheets-get-spreadsheet`, `sheets-get-values`, `sheets-batch-get-values`, `sheets-update-values`, `sheets-batch-update-values`, `sheets-append-values`, `sheets-create-spreadsheet`, `sheets-manage-sheets`, `sheets-clear-values` |
 | `shared-drives.ts` | `list-shared-drives`, `get-shared-drive`, `create-shared-drive` (GWS) |
 | `labels.ts` | `list-file-labels`, `apply-label`, `remove-label` (GWS) |
 | `approvals.ts` | `list-approvals`, `get-approval` (GWS) |

@@ -64,6 +64,19 @@ import { getAboutSchema, getAbout } from "./tools/about.js";
 // Activity (available to all, but more useful for GWS)
 import { getActivitySchema, getActivity } from "./tools/activity.js";
 
+// Sheets
+import {
+  getSpreadsheetSchema, getSpreadsheet,
+  getValuesSchema, getValues,
+  batchGetValuesSchema, batchGetValues,
+  updateValuesSchema, updateValues,
+  batchUpdateValuesSchema, batchUpdateValues,
+  appendValuesSchema, appendValues,
+  createSpreadsheetSchema, createSpreadsheet,
+  manageSheetsSchema, manageSheets,
+  clearValuesSchema, clearValues,
+} from "./tools/sheets.js";
+
 // GWS-only: Shared Drives
 import {
   listSharedDrivesSchema, listSharedDrives,
@@ -88,7 +101,7 @@ import {
 
 const server = new McpServer({
   name: "google-drive",
-  version: "1.0.1",
+  version: "1.1.0",
 });
 
 // ── Universal tools (personal + GWS) ───────────────────────────────────────
@@ -268,6 +281,71 @@ server.tool(
   "Get the activity history for a file or folder. Shows who viewed, edited, commented, or changed permissions. Works for both personal and GWS accounts",
   getActivitySchema.shape,
   wrapToolHandler(getActivity),
+);
+
+// ── Sheets tools ────────────────────────────────────────────────────────────
+
+server.tool(
+  "sheets-get-spreadsheet",
+  "Get spreadsheet metadata — title, locale, and list of sheets (tabs) with their dimensions",
+  getSpreadsheetSchema.shape,
+  wrapToolHandler(getSpreadsheet),
+);
+
+server.tool(
+  "sheets-get-values",
+  "Read cell values from a range in A1 notation (e.g., 'Sheet1!A1:D10'). Supports formatted values, raw values, or formulas",
+  getValuesSchema.shape,
+  wrapToolHandler(getValues),
+);
+
+server.tool(
+  "sheets-batch-get-values",
+  "Read multiple ranges in a single request. More efficient than multiple get-values calls",
+  batchGetValuesSchema.shape,
+  wrapToolHandler(batchGetValues),
+);
+
+server.tool(
+  "sheets-update-values",
+  "Write values to a range. Values are parsed as if typed by a user (formulas, dates). Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  updateValuesSchema.shape,
+  wrapToolHandler(updateValues),
+);
+
+server.tool(
+  "sheets-batch-update-values",
+  "Write to multiple ranges in one request. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  batchUpdateValuesSchema.shape,
+  wrapToolHandler(batchUpdateValues),
+);
+
+server.tool(
+  "sheets-append-values",
+  "Append rows to the end of a table in a sheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  appendValuesSchema.shape,
+  wrapToolHandler(appendValues),
+);
+
+server.tool(
+  "sheets-create-spreadsheet",
+  "Create a new spreadsheet with optional sheet names and target folder. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  createSpreadsheetSchema.shape,
+  wrapToolHandler(createSpreadsheet),
+);
+
+server.tool(
+  "sheets-manage-sheets",
+  "Add, delete, or rename sheets (tabs) within a spreadsheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  manageSheetsSchema.shape,
+  wrapToolHandler(manageSheets),
+);
+
+server.tool(
+  "sheets-clear-values",
+  "Clear all values from a range without removing formatting. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  clearValuesSchema.shape,
+  wrapToolHandler(clearValues),
 );
 
 // ── GWS-only tools ──────────────────────────────────────────────────────────
