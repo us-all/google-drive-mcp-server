@@ -41,7 +41,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 - **OAuth2**: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` + `GOOGLE_REFRESH_TOKEN`
 - **Service Account**: `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` + optional `GOOGLE_IMPERSONATE_USER`
 
-## Tool Categories (41 tools)
+## Tool Categories (62 tools)
 
 | File | Tools |
 |------|-------|
@@ -54,7 +54,10 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 | `revisions.ts` | `list-revisions`, `get-revision` |
 | `about.ts` | `get-about` |
 | `activity.ts` | `get-activity` |
-| `sheets.ts` | `sheets-get-spreadsheet`, `sheets-get-values`, `sheets-batch-get-values`, `sheets-update-values`, `sheets-batch-update-values`, `sheets-append-values`, `sheets-create-spreadsheet`, `sheets-manage-sheets`, `sheets-clear-values` |
+| `sheets.ts` | **Data**: `sheets-get-spreadsheet`, `sheets-get-values`, `sheets-batch-get-values`, `sheets-update-values`, `sheets-batch-update-values`, `sheets-append-values`, `sheets-clear-values`, `sheets-batch-clear-values`, `sheets-create-spreadsheet`, `sheets-manage-sheets` |
+|  | **Structure**: `sheets-insert-dimension`, `sheets-delete-dimension`, `sheets-duplicate-sheet`, `sheets-copy-sheet-to`, `sheets-copy-paste`, `sheets-sort-range`, `sheets-find-replace` |
+|  | **Formatting**: `sheets-format-cells`, `sheets-update-borders`, `sheets-merge-cells`, `sheets-unmerge-cells`, `sheets-auto-resize`, `sheets-resize-dimensions` |
+|  | **Advanced**: `sheets-set-data-validation`, `sheets-add-conditional-format`, `sheets-add-chart`, `sheets-delete-chart`, `sheets-add-protected-range`, `sheets-delete-protected-range`, `sheets-manage-named-range` |
 | `shared-drives.ts` | `list-shared-drives`, `get-shared-drive`, `create-shared-drive` (GWS) |
 | `labels.ts` | `list-file-labels`, `apply-label`, `remove-label` (GWS) |
 | `approvals.ts` | `list-approvals`, `get-approval` (GWS) |

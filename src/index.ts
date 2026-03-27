@@ -75,6 +75,27 @@ import {
   createSpreadsheetSchema, createSpreadsheet,
   manageSheetsSchema, manageSheets,
   clearValuesSchema, clearValues,
+  batchClearValuesSchema, batchClearValues,
+  formatCellsSchema, formatCells,
+  updateBordersSchema, updateBorders,
+  mergeCellsSchema, mergeCells,
+  unmergeCellsSchema, unmergeCells,
+  sortRangeSchema, sortRange,
+  findReplaceSchema, findReplace,
+  insertDimensionSchema, insertDimension,
+  deleteDimensionSchema, deleteDimension,
+  copySheetToSchema, copySheetTo,
+  duplicateSheetSchema, duplicateSheet,
+  autoResizeSchema, autoResize,
+  setDataValidationSchema, setDataValidation,
+  addConditionalFormatSchema, addConditionalFormat,
+  addChartSchema, addChart,
+  deleteChartSchema, deleteChart,
+  addProtectedRangeSchema, addProtectedRange,
+  deleteProtectedRangeSchema, deleteProtectedRange,
+  manageNamedRangeSchema, manageNamedRange,
+  copyPasteSchema, copyPaste,
+  resizeDimensionsSchema, resizeDimensions,
 } from "./tools/sheets.js";
 
 // GWS-only: Shared Drives
@@ -346,6 +367,153 @@ server.tool(
   "Clear all values from a range without removing formatting. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   clearValuesSchema.shape,
   wrapToolHandler(clearValues),
+);
+
+server.tool(
+  "sheets-batch-clear-values",
+  "Clear values from multiple ranges at once. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  batchClearValuesSchema.shape,
+  wrapToolHandler(batchClearValues),
+);
+
+server.tool(
+  "sheets-format-cells",
+  "Format cells — bold, italic, font, colors, alignment, number format, wrap. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  formatCellsSchema.shape,
+  wrapToolHandler(formatCells),
+);
+
+server.tool(
+  "sheets-update-borders",
+  "Set borders on a range — top, bottom, left, right, inner horizontal/vertical. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  updateBordersSchema.shape,
+  wrapToolHandler(updateBorders),
+);
+
+server.tool(
+  "sheets-merge-cells",
+  "Merge cells in a range. Supports MERGE_ALL, MERGE_COLUMNS, MERGE_ROWS. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  mergeCellsSchema.shape,
+  wrapToolHandler(mergeCells),
+);
+
+server.tool(
+  "sheets-unmerge-cells",
+  "Unmerge previously merged cells in a range. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  unmergeCellsSchema.shape,
+  wrapToolHandler(unmergeCells),
+);
+
+server.tool(
+  "sheets-sort-range",
+  "Sort a range by one or more columns, ascending or descending. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  sortRangeSchema.shape,
+  wrapToolHandler(sortRange),
+);
+
+server.tool(
+  "sheets-find-replace",
+  "Find and replace text across a sheet or entire spreadsheet. Supports regex. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  findReplaceSchema.shape,
+  wrapToolHandler(findReplace),
+);
+
+server.tool(
+  "sheets-insert-dimension",
+  "Insert rows or columns at a specific position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  insertDimensionSchema.shape,
+  wrapToolHandler(insertDimension),
+);
+
+server.tool(
+  "sheets-delete-dimension",
+  "Delete rows or columns from a sheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  deleteDimensionSchema.shape,
+  wrapToolHandler(deleteDimension),
+);
+
+server.tool(
+  "sheets-copy-sheet-to",
+  "Copy a sheet (tab) to another spreadsheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  copySheetToSchema.shape,
+  wrapToolHandler(copySheetTo),
+);
+
+server.tool(
+  "sheets-duplicate-sheet",
+  "Duplicate a sheet within the same spreadsheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  duplicateSheetSchema.shape,
+  wrapToolHandler(duplicateSheet),
+);
+
+server.tool(
+  "sheets-auto-resize",
+  "Auto-fit column widths or row heights to content. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  autoResizeSchema.shape,
+  wrapToolHandler(autoResize),
+);
+
+server.tool(
+  "sheets-set-data-validation",
+  "Set data validation rules — dropdowns, number constraints, date rules, custom formulas. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  setDataValidationSchema.shape,
+  wrapToolHandler(setDataValidation),
+);
+
+server.tool(
+  "sheets-add-conditional-format",
+  "Add conditional formatting — highlight rules or color gradient scales. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  addConditionalFormatSchema.shape,
+  wrapToolHandler(addConditionalFormat),
+);
+
+server.tool(
+  "sheets-add-chart",
+  "Create an embedded chart (bar, line, area, column, scatter, combo). Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  addChartSchema.shape,
+  wrapToolHandler(addChart),
+);
+
+server.tool(
+  "sheets-delete-chart",
+  "Delete an embedded chart by chart ID. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  deleteChartSchema.shape,
+  wrapToolHandler(deleteChart),
+);
+
+server.tool(
+  "sheets-add-protected-range",
+  "Protect a range so only specific editors can modify it. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  addProtectedRangeSchema.shape,
+  wrapToolHandler(addProtectedRange),
+);
+
+server.tool(
+  "sheets-delete-protected-range",
+  "Remove protection from a range. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  deleteProtectedRangeSchema.shape,
+  wrapToolHandler(deleteProtectedRange),
+);
+
+server.tool(
+  "sheets-manage-named-range",
+  "Add, update, or delete named ranges. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  manageNamedRangeSchema.shape,
+  wrapToolHandler(manageNamedRange),
+);
+
+server.tool(
+  "sheets-copy-paste",
+  "Copy and paste a range within or across sheets — supports paste values, format, formulas, transpose. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  copyPasteSchema.shape,
+  wrapToolHandler(copyPaste),
+);
+
+server.tool(
+  "sheets-resize-dimensions",
+  "Set explicit row height or column width in pixels. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  resizeDimensionsSchema.shape,
+  wrapToolHandler(resizeDimensions),
 );
 
 // ── GWS-only tools ──────────────────────────────────────────────────────────
