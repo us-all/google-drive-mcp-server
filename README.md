@@ -9,6 +9,7 @@ A Model Context Protocol (MCP) server for Google Drive with **Google Workspace a
 | Feature | Personal | GWS Standard+ | GWS Enterprise |
 |---------|----------|---------------|----------------|
 | File CRUD, Search, Export | ✅ | ✅ | ✅ |
+| **Google Sheets (30 tools)** | ✅ | ✅ | ✅ |
 | Comments & Revisions | ✅ | ✅ | ✅ |
 | Drive Activity | ✅ | ✅ | ✅ |
 | Content Restrictions | ✅ | ✅ | ✅ |
@@ -85,9 +86,9 @@ pnpm start
 claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 ```
 
-## Tools (30)
+## Tools (62)
 
-### Universal (Personal + GWS)
+### Drive (24 tools — Personal + GWS)
 
 | Tool | Description | R/W |
 |------|-------------|-----|
@@ -116,7 +117,59 @@ claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 | `get-revision` | Get specific revision details | R |
 | `get-activity` | File/folder activity history (edits, views, permission changes) | R |
 
-### GWS-Only (Google Workspace)
+### Google Sheets (30 tools)
+
+**Data**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `sheets-get-spreadsheet` | Spreadsheet metadata — title, locale, sheets (tabs) | R |
+| `sheets-get-values` | Read cell values from a range (A1 notation) | R |
+| `sheets-batch-get-values` | Read multiple ranges in one request | R |
+| `sheets-update-values` | Write values to a range | W |
+| `sheets-batch-update-values` | Write to multiple ranges in one request | W |
+| `sheets-append-values` | Append rows to the end of a table | W |
+| `sheets-clear-values` | Clear values from a range | W |
+| `sheets-batch-clear-values` | Clear multiple ranges at once | W |
+| `sheets-create-spreadsheet` | Create a new spreadsheet | W |
+| `sheets-manage-sheets` | Add, delete, or rename sheets (tabs) | W |
+
+**Structure**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `sheets-insert-dimension` | Insert rows or columns at a position | W |
+| `sheets-delete-dimension` | Delete rows or columns | W |
+| `sheets-duplicate-sheet` | Duplicate a sheet within the spreadsheet | W |
+| `sheets-copy-sheet-to` | Copy a sheet to another spreadsheet | W |
+| `sheets-copy-paste` | Copy/paste ranges with paste type control | W |
+| `sheets-sort-range` | Sort a range by columns | W |
+| `sheets-find-replace` | Find and replace text (supports regex) | W |
+
+**Formatting**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `sheets-format-cells` | Bold, italic, font, colors, alignment, number format | W |
+| `sheets-update-borders` | Set borders on a range | W |
+| `sheets-merge-cells` | Merge cells (all, columns, or rows) | W |
+| `sheets-unmerge-cells` | Unmerge previously merged cells | W |
+| `sheets-auto-resize` | Auto-fit column widths or row heights | W |
+| `sheets-resize-dimensions` | Set explicit row height or column width | W |
+
+**Advanced**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `sheets-set-data-validation` | Dropdowns, number constraints, custom formulas | W |
+| `sheets-add-conditional-format` | Highlight rules or color gradient scales | W |
+| `sheets-add-chart` | Create embedded charts (bar, line, column, scatter, etc.) | W |
+| `sheets-delete-chart` | Delete an embedded chart | W |
+| `sheets-add-protected-range` | Protect a range (restrict editors) | W |
+| `sheets-delete-protected-range` | Remove range protection | W |
+| `sheets-manage-named-range` | Add, update, or delete named ranges | W |
+
+### GWS-Only (8 tools — Google Workspace)
 
 | Tool | Description | R/W |
 |------|-------------|-----|
@@ -152,13 +205,14 @@ Claude / AI Client
 │  │               tools/                      │   │
 │  │  files · search · folders · permissions   │   │
 │  │  export · comments · revisions · about    │   │
-│  │  activity · shared-drives · labels        │   │
-│  │  approvals                                │   │
+│  │  activity · sheets · shared-drives        │   │
+│  │  labels · approvals                       │   │
 │  └───────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
               Google Drive API v3
+              Google Sheets API v4
               Drive Activity API v2
               Drive Labels API v2
 ```
@@ -168,7 +222,7 @@ Claude / AI Client
 ### OAuth2 (Personal or GWS)
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a project and enable the **Google Drive API**
+2. Create a project and enable the **Google Drive API** and **Google Sheets API**
 3. Create OAuth2 credentials (Desktop App type)
 4. Get a refresh token using the OAuth2 playground or your own flow
 5. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
@@ -192,7 +246,7 @@ All write operations (create, update, delete, share) are **disabled by default**
 - **Runtime**: Node.js 18+
 - **Language**: TypeScript (strict mode)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Drive Activity API v2, Drive Labels API v2)
+- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Drive Activity API v2, Drive Labels API v2)
 - **Validation**: Zod
 - **Package Manager**: pnpm
 - **Test**: Vitest

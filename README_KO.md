@@ -9,6 +9,7 @@
 | 기능 | 개인 계정 | GWS Standard+ | GWS Enterprise |
 |------|-----------|---------------|----------------|
 | 파일 CRUD, 검색, 내보내기 | ✅ | ✅ | ✅ |
+| **Google Sheets (30개 도구)** | ✅ | ✅ | ✅ |
 | 댓글 & 리비전 | ✅ | ✅ | ✅ |
 | Drive 활동 이력 | ✅ | ✅ | ✅ |
 | 콘텐츠 제한 | ✅ | ✅ | ✅ |
@@ -85,9 +86,9 @@ pnpm start
 claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 ```
 
-## 도구 목록 (30개)
+## 도구 목록 (62개)
 
-### 공통 도구 (개인 + GWS)
+### Drive (24개 — 개인 + GWS)
 
 | 도구 | 설명 | R/W |
 |------|------|-----|
@@ -116,7 +117,59 @@ claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 | `get-revision` | 특정 리비전 상세 | R |
 | `get-activity` | 파일/폴더 활동 이력 (수정, 조회, 권한 변경) | R |
 
-### GWS 전용 도구 (Google Workspace)
+### Google Sheets (30개)
+
+**데이터**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `sheets-get-spreadsheet` | 스프레드시트 메타데이터 — 제목, 로케일, 시트(탭) 목록 | R |
+| `sheets-get-values` | A1 표기법으로 셀 값 읽기 | R |
+| `sheets-batch-get-values` | 여러 범위를 한 번에 읽기 | R |
+| `sheets-update-values` | 범위에 값 쓰기 | W |
+| `sheets-batch-update-values` | 여러 범위에 한 번에 쓰기 | W |
+| `sheets-append-values` | 테이블 끝에 행 추가 | W |
+| `sheets-clear-values` | 범위의 값 초기화 | W |
+| `sheets-batch-clear-values` | 여러 범위 한 번에 초기화 | W |
+| `sheets-create-spreadsheet` | 새 스프레드시트 생성 | W |
+| `sheets-manage-sheets` | 시트(탭) 추가, 삭제, 이름 변경 | W |
+
+**구조 편집**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `sheets-insert-dimension` | 행 또는 열 삽입 | W |
+| `sheets-delete-dimension` | 행 또는 열 삭제 | W |
+| `sheets-duplicate-sheet` | 시트 복제 (같은 스프레드시트 내) | W |
+| `sheets-copy-sheet-to` | 시트를 다른 스프레드시트로 복사 | W |
+| `sheets-copy-paste` | 범위 복사/붙여넣기 (값, 서식, 수식 등 선택) | W |
+| `sheets-sort-range` | 범위를 열 기준으로 정렬 | W |
+| `sheets-find-replace` | 텍스트 찾기/바꾸기 (정규식 지원) | W |
+
+**서식**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `sheets-format-cells` | 볼드, 이탤릭, 폰트, 색상, 정렬, 숫자 포맷 | W |
+| `sheets-update-borders` | 범위에 테두리 설정 | W |
+| `sheets-merge-cells` | 셀 병합 (전체, 열별, 행별) | W |
+| `sheets-unmerge-cells` | 병합된 셀 해제 | W |
+| `sheets-auto-resize` | 열 너비/행 높이 자동 맞춤 | W |
+| `sheets-resize-dimensions` | 행 높이/열 너비 직접 지정 (픽셀) | W |
+
+**고급**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `sheets-set-data-validation` | 드롭다운, 숫자 제약, 커스텀 수식 검증 | W |
+| `sheets-add-conditional-format` | 조건부 서식 — 하이라이트 규칙, 색상 그라데이션 | W |
+| `sheets-add-chart` | 차트 생성 (막대, 선, 열, 산점도 등) | W |
+| `sheets-delete-chart` | 차트 삭제 | W |
+| `sheets-add-protected-range` | 범위 보호 (편집자 제한) | W |
+| `sheets-delete-protected-range` | 범위 보호 해제 | W |
+| `sheets-manage-named-range` | 이름 범위 추가, 수정, 삭제 | W |
+
+### GWS 전용 도구 (8개 — Google Workspace)
 
 | 도구 | 설명 | R/W |
 |------|------|-----|
@@ -152,13 +205,14 @@ Claude / AI 클라이언트
 │  │               tools/                      │   │
 │  │  files · search · folders · permissions   │   │
 │  │  export · comments · revisions · about    │   │
-│  │  activity · shared-drives · labels        │   │
-│  │  approvals                                │   │
+│  │  activity · sheets · shared-drives        │   │
+│  │  labels · approvals                       │   │
 │  └───────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
               Google Drive API v3
+              Google Sheets API v4
               Drive Activity API v2
               Drive Labels API v2
 ```
@@ -168,7 +222,7 @@ Claude / AI 클라이언트
 ### OAuth2 (개인 또는 GWS)
 
 1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 생성
-2. **Google Drive API** 활성화
+2. **Google Drive API** 및 **Google Sheets API** 활성화
 3. OAuth2 사용자 인증 정보 생성 (데스크톱 앱 유형)
 4. OAuth2 플레이그라운드 등을 사용하여 리프레시 토큰 획득
 5. `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` 설정
@@ -192,7 +246,7 @@ Claude / AI 클라이언트
 - **런타임**: Node.js 18+
 - **언어**: TypeScript (strict 모드)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Drive Activity API v2, Drive Labels API v2)
+- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Drive Activity API v2, Drive Labels API v2)
 - **검증**: Zod
 - **패키지 매니저**: pnpm
 - **테스트**: Vitest

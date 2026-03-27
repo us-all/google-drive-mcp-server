@@ -40,6 +40,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 ## Auth Methods
 - **OAuth2**: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` + `GOOGLE_REFRESH_TOKEN`
 - **Service Account**: `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` + optional `GOOGLE_IMPERSONATE_USER`
+- **ADC**: `gcloud auth application-default login --client-id-file=client_secret.json --scopes=...` (auto-detected)
 
 ## Tool Categories (62 tools)
 
