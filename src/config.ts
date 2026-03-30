@@ -60,14 +60,24 @@ function findAdcFile(): string | null {
   const envPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (envPath && fs.existsSync(envPath)) return envPath;
 
-  // 2. gcloud default location
-  const defaultPath = path.join(
-    os.homedir(),
-    ".config",
-    "gcloud",
-    "application_default_credentials.json",
+  // 2. gcloud default location (platform-specific)
+  const candidates: string[] = [];
+
+  // Windows: %APPDATA%\gcloud\application_default_credentials.json
+  if (process.env.APPDATA) {
+    candidates.push(
+      path.join(process.env.APPDATA, "gcloud", "application_default_credentials.json"),
+    );
+  }
+
+  // Unix/macOS: ~/.config/gcloud/application_default_credentials.json
+  candidates.push(
+    path.join(os.homedir(), ".config", "gcloud", "application_default_credentials.json"),
   );
-  if (fs.existsSync(defaultPath)) return defaultPath;
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
 
   return null;
 }

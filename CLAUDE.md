@@ -63,6 +63,10 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 | `labels.ts` | `list-file-labels`, `apply-label`, `remove-label` (GWS) |
 | `approvals.ts` | `list-approvals`, `get-approval` (GWS) |
 
+## 최근 변경사항 (2026-03-30)
+
+- **v1.1.1**: Windows ADC 경로 지원 — `%APPDATA%\gcloud\` 경로 인식 추가 (기존 Unix 경로만 지원)
+
 ## Known Limitations
 
 - Approvals API: `googleapis` SDK has no typed bindings yet — uses raw `fetch` with auth header extraction
