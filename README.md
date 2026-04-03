@@ -86,7 +86,7 @@ pnpm start
 claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 ```
 
-## Tools (62)
+## Tools (82)
 
 ### Drive (24 tools — Personal + GWS)
 
@@ -168,6 +168,48 @@ claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 | `sheets-add-protected-range` | Protect a range (restrict editors) | W |
 | `sheets-delete-protected-range` | Remove range protection | W |
 | `sheets-manage-named-range` | Add, update, or delete named ranges | W |
+
+### Google Slides (20 tools)
+
+**Presentation**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `slides-get-presentation` | Get presentation metadata, slides list, and layout info | R |
+| `slides-create-presentation` | Create a new presentation | W |
+| `slides-duplicate-presentation` | Duplicate an existing presentation (via Drive copy) | W |
+
+**Slide Management**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `slides-get-slide` | Get slide details with all elements | R |
+| `slides-add-slide` | Add a new slide with optional layout | W |
+| `slides-delete-slide` | Delete a slide | W |
+| `slides-move-slide` | Reorder a slide | W |
+| `slides-duplicate-slide` | Duplicate a slide within the presentation | W |
+
+**Content**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `slides-insert-text` | Insert text into an existing text box | W |
+| `slides-replace-text` | Find and replace text across the presentation | W |
+| `slides-insert-text-box` | Create a new text box with text | W |
+| `slides-insert-image` | Insert an image from URL | W |
+| `slides-insert-table` | Create a table | W |
+| `slides-update-table-cell` | Update text in a table cell | W |
+| `slides-insert-shape` | Insert a shape (rectangle, ellipse, etc.) | W |
+
+**Formatting**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `slides-format-text` | Text style (font, size, color, bold, italic) | W |
+| `slides-format-shape` | Shape fill color and border | W |
+| `slides-resize-element` | Change element size and position | W |
+| `slides-set-slide-background` | Set slide background color | W |
+| `slides-batch-update` | Raw batchUpdate for advanced operations | W |
 
 ### GWS-Only (8 tools — Google Workspace)
 

@@ -3,7 +3,7 @@
 ## Tech Stack
 - Node.js 18+, pnpm, TypeScript (strict, ESM)
 - `@modelcontextprotocol/sdk` — MCP protocol
-- `googleapis` — Google Drive API v3, Drive Activity API v2, Drive Labels API v2, Sheets API v4
+- `googleapis` — Google Drive API v3, Drive Activity API v2, Drive Labels API v2, Sheets API v4, Slides API v1
 - `zod` — input validation
 - `dotenv` — env loading
 - `vitest` — testing
@@ -42,7 +42,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 - **Service Account**: `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` + optional `GOOGLE_IMPERSONATE_USER`
 - **ADC**: `gcloud auth application-default login --client-id-file=client_secret.json --scopes=...` (auto-detected)
 
-## Tool Categories (62 tools)
+## Tool Categories (82 tools)
 
 | File | Tools |
 |------|-------|
@@ -62,9 +62,14 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 | `shared-drives.ts` | `list-shared-drives`, `get-shared-drive`, `create-shared-drive` (GWS) |
 | `labels.ts` | `list-file-labels`, `apply-label`, `remove-label` (GWS) |
 | `approvals.ts` | `list-approvals`, `get-approval` (GWS) |
+| `slides.ts` | **Presentation**: `slides-get-presentation`, `slides-create-presentation`, `slides-duplicate-presentation` |
+|  | **Slide Management**: `slides-get-slide`, `slides-add-slide`, `slides-delete-slide`, `slides-move-slide`, `slides-duplicate-slide` |
+|  | **Content**: `slides-insert-text`, `slides-replace-text`, `slides-insert-text-box`, `slides-insert-image`, `slides-insert-table`, `slides-update-table-cell`, `slides-insert-shape` |
+|  | **Formatting**: `slides-format-text`, `slides-format-shape`, `slides-resize-element`, `slides-set-slide-background`, `slides-batch-update` |
 
-## 최근 변경사항 (2026-03-30)
+## 최근 변경사항 (2026-04-03)
 
+- **v1.2.0**: Google Slides API v1 지원 추가 — 20개 도구 (프레젠테이션 관리, 슬라이드 편집, 콘텐츠 삽입, 서식)
 - **v1.1.1**: Windows ADC 경로 지원 — `%APPDATA%\gcloud\` 경로 인식 추가 (기존 Unix 경로만 지원)
 
 ## Known Limitations

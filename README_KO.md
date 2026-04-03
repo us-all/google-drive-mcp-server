@@ -86,7 +86,7 @@ pnpm start
 claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 ```
 
-## 도구 목록 (62개)
+## 도구 목록 (82개)
 
 ### Drive (24개 — 개인 + GWS)
 
@@ -168,6 +168,48 @@ claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 | `sheets-add-protected-range` | 범위 보호 (편집자 제한) | W |
 | `sheets-delete-protected-range` | 범위 보호 해제 | W |
 | `sheets-manage-named-range` | 이름 범위 추가, 수정, 삭제 | W |
+
+### Google Slides (20개)
+
+**프레젠테이션**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `slides-get-presentation` | 프레젠테이션 메타데이터, 슬라이드 목록, 레이아웃 정보 조회 | R |
+| `slides-create-presentation` | 새 프레젠테이션 생성 | W |
+| `slides-duplicate-presentation` | 기존 프레젠테이션 복제 (Drive copy 활용) | W |
+
+**슬라이드 관리**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `slides-get-slide` | 슬라이드 상세 조회 (모든 요소 포함) | R |
+| `slides-add-slide` | 슬라이드 추가 (레이아웃 선택 가능) | W |
+| `slides-delete-slide` | 슬라이드 삭제 | W |
+| `slides-move-slide` | 슬라이드 순서 변경 | W |
+| `slides-duplicate-slide` | 슬라이드 복제 | W |
+
+**콘텐츠**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `slides-insert-text` | 기존 텍스트 상자에 텍스트 삽입 | W |
+| `slides-replace-text` | 프레젠테이션 전체에서 텍스트 찾기/바꾸기 | W |
+| `slides-insert-text-box` | 새 텍스트 상자 생성 및 텍스트 삽입 | W |
+| `slides-insert-image` | URL 기반 이미지 삽입 | W |
+| `slides-insert-table` | 테이블 생성 | W |
+| `slides-update-table-cell` | 테이블 셀 텍스트 수정 | W |
+| `slides-insert-shape` | 도형 삽입 (직사각형, 원 등) | W |
+
+**서식**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `slides-format-text` | 텍스트 스타일 (폰트, 크기, 색상, 볼드, 이탤릭) | W |
+| `slides-format-shape` | 도형 배경색 및 테두리 | W |
+| `slides-resize-element` | 요소 크기 및 위치 변경 | W |
+| `slides-set-slide-background` | 슬라이드 배경 색상 설정 | W |
+| `slides-batch-update` | 고급 작업을 위한 Raw batchUpdate | W |
 
 ### GWS 전용 도구 (8개 — Google Workspace)
 

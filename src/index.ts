@@ -98,6 +98,30 @@ import {
   resizeDimensionsSchema, resizeDimensions,
 } from "./tools/sheets.js";
 
+// Slides
+import {
+  getSlidesPresentationSchema, getSlidesPresentation,
+  createPresentationSchema, createPresentation,
+  duplicatePresentationSchema, duplicatePresentation,
+  getSlideSchema, getSlide,
+  addSlideSchema, addSlide,
+  deleteSlideSchema, deleteSlide,
+  moveSlideSchema, moveSlide,
+  duplicateSlideSchema, duplicateSlide,
+  insertTextSchema, insertText,
+  replaceTextSchema, replaceAllText,
+  insertTextBoxSchema, insertTextBox,
+  insertImageSchema, insertImage,
+  insertTableSchema, insertTable,
+  updateTableCellSchema, updateTableCell,
+  insertShapeSchema, insertShape,
+  formatTextSchema, formatText,
+  formatShapeSchema, formatShape,
+  resizeElementSchema, resizeElement,
+  setSlideBackgroundSchema, setSlideBackground,
+  slidesBatchUpdateSchema, slidesBatchUpdate,
+} from "./tools/slides.js";
+
 // GWS-only: Shared Drives
 import {
   listSharedDrivesSchema, listSharedDrives,
@@ -514,6 +538,148 @@ server.tool(
   "Set explicit row height or column width in pixels. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   resizeDimensionsSchema.shape,
   wrapToolHandler(resizeDimensions),
+);
+
+// ── Slides tools ─────────────────────────────────────────────────────────
+
+server.tool(
+  "slides-get-presentation",
+  "Get presentation metadata, slides list, and master/layout info",
+  getSlidesPresentationSchema.shape,
+  wrapToolHandler(getSlidesPresentation),
+);
+
+server.tool(
+  "slides-create-presentation",
+  "Create a new Google Slides presentation. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  createPresentationSchema.shape,
+  wrapToolHandler(createPresentation),
+);
+
+server.tool(
+  "slides-duplicate-presentation",
+  "Duplicate a presentation via Drive copy. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  duplicatePresentationSchema.shape,
+  wrapToolHandler(duplicatePresentation),
+);
+
+server.tool(
+  "slides-get-slide",
+  "Get details of a specific slide including all page elements, shapes, text, images, and tables",
+  getSlideSchema.shape,
+  wrapToolHandler(getSlide),
+);
+
+server.tool(
+  "slides-add-slide",
+  "Add a new slide with optional layout (predefined or by layoutId). Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  addSlideSchema.shape,
+  wrapToolHandler(addSlide),
+);
+
+server.tool(
+  "slides-delete-slide",
+  "Delete a slide by objectId. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  deleteSlideSchema.shape,
+  wrapToolHandler(deleteSlide),
+);
+
+server.tool(
+  "slides-move-slide",
+  "Reorder slides within a presentation. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  moveSlideSchema.shape,
+  wrapToolHandler(moveSlide),
+);
+
+server.tool(
+  "slides-duplicate-slide",
+  "Duplicate an existing slide within the same presentation. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  duplicateSlideSchema.shape,
+  wrapToolHandler(duplicateSlide),
+);
+
+server.tool(
+  "slides-insert-text",
+  "Insert text into an existing text box or shape by objectId. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  insertTextSchema.shape,
+  wrapToolHandler(insertText),
+);
+
+server.tool(
+  "slides-replace-text",
+  "Find and replace text across the entire presentation or specific slides. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  replaceTextSchema.shape,
+  wrapToolHandler(replaceAllText),
+);
+
+server.tool(
+  "slides-insert-text-box",
+  "Create a new text box with text, position, and size on a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  insertTextBoxSchema.shape,
+  wrapToolHandler(insertTextBox),
+);
+
+server.tool(
+  "slides-insert-image",
+  "Insert an image from a URL onto a slide with position and size. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  insertImageSchema.shape,
+  wrapToolHandler(insertImage),
+);
+
+server.tool(
+  "slides-insert-table",
+  "Create a table with specified rows and columns on a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  insertTableSchema.shape,
+  wrapToolHandler(insertTable),
+);
+
+server.tool(
+  "slides-update-table-cell",
+  "Update text in a specific table cell by row and column index. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  updateTableCellSchema.shape,
+  wrapToolHandler(updateTableCell),
+);
+
+server.tool(
+  "slides-insert-shape",
+  "Insert a shape (RECTANGLE, ELLIPSE, ROUND_RECTANGLE, STAR_5, ARROW_LEFT, etc.) onto a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  insertShapeSchema.shape,
+  wrapToolHandler(insertShape),
+);
+
+server.tool(
+  "slides-format-text",
+  "Format text style — bold, italic, underline, font family, font size, text color. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  formatTextSchema.shape,
+  wrapToolHandler(formatText),
+);
+
+server.tool(
+  "slides-format-shape",
+  "Format shape fill color, border color, and border weight. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  formatShapeSchema.shape,
+  wrapToolHandler(formatShape),
+);
+
+server.tool(
+  "slides-resize-element",
+  "Change an element's position and/or size on a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  resizeElementSchema.shape,
+  wrapToolHandler(resizeElement),
+);
+
+server.tool(
+  "slides-set-slide-background",
+  "Set a slide's background to a solid color. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  setSlideBackgroundSchema.shape,
+  wrapToolHandler(setSlideBackground),
+);
+
+server.tool(
+  "slides-batch-update",
+  "Execute raw Slides API batchUpdate requests for advanced operations not covered by other tools. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  slidesBatchUpdateSchema.shape,
+  wrapToolHandler(slidesBatchUpdate),
 );
 
 // ── GWS-only tools ──────────────────────────────────────────────────────────
