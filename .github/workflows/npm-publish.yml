@@ -19,8 +19,6 @@ jobs:
           node-version: 22
           cache: pnpm
           registry-url: https://registry.npmjs.org
-      - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - name: Preflight dry-run
