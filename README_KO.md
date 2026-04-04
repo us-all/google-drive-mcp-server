@@ -10,6 +10,7 @@
 |------|-----------|---------------|----------------|
 | 파일 CRUD, 검색, 내보내기 | ✅ | ✅ | ✅ |
 | **Google Sheets (30개 도구)** | ✅ | ✅ | ✅ |
+| **Google Slides (20개 도구)** | ✅ | ✅ | ✅ |
 | 댓글 & 리비전 | ✅ | ✅ | ✅ |
 | Drive 활동 이력 | ✅ | ✅ | ✅ |
 | 콘텐츠 제한 | ✅ | ✅ | ✅ |
@@ -247,14 +248,15 @@ Claude / AI 클라이언트
 │  │               tools/                      │   │
 │  │  files · search · folders · permissions   │   │
 │  │  export · comments · revisions · about    │   │
-│  │  activity · sheets · shared-drives        │   │
-│  │  labels · approvals                       │   │
+│  │  activity · sheets · slides                │   │
+│  │  shared-drives · labels · approvals       │   │
 │  └───────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
               Google Drive API v3
               Google Sheets API v4
+              Google Slides API v1
               Drive Activity API v2
               Drive Labels API v2
 ```
@@ -264,7 +266,7 @@ Claude / AI 클라이언트
 ### OAuth2 (개인 또는 GWS)
 
 1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 생성
-2. **Google Drive API** 및 **Google Sheets API** 활성화
+2. **Google Drive API**, **Google Sheets API**, **Google Slides API** 활성화
 3. OAuth2 사용자 인증 정보 생성 (데스크톱 앱 유형)
 4. OAuth2 플레이그라운드 등을 사용하여 리프레시 토큰 획득
 5. `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` 설정
@@ -288,7 +290,7 @@ Claude / AI 클라이언트
 - **런타임**: Node.js 18+
 - **언어**: TypeScript (strict 모드)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Drive Activity API v2, Drive Labels API v2)
+- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
 - **검증**: Zod
 - **패키지 매니저**: pnpm
 - **테스트**: Vitest

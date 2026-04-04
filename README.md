@@ -10,6 +10,7 @@ A Model Context Protocol (MCP) server for Google Drive with **Google Workspace a
 |---------|----------|---------------|----------------|
 | File CRUD, Search, Export | ✅ | ✅ | ✅ |
 | **Google Sheets (30 tools)** | ✅ | ✅ | ✅ |
+| **Google Slides (20 tools)** | ✅ | ✅ | ✅ |
 | Comments & Revisions | ✅ | ✅ | ✅ |
 | Drive Activity | ✅ | ✅ | ✅ |
 | Content Restrictions | ✅ | ✅ | ✅ |
@@ -247,14 +248,15 @@ Claude / AI Client
 │  │               tools/                      │   │
 │  │  files · search · folders · permissions   │   │
 │  │  export · comments · revisions · about    │   │
-│  │  activity · sheets · shared-drives        │   │
-│  │  labels · approvals                       │   │
+│  │  activity · sheets · slides                │   │
+│  │  shared-drives · labels · approvals       │   │
 │  └───────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
               Google Drive API v3
               Google Sheets API v4
+              Google Slides API v1
               Drive Activity API v2
               Drive Labels API v2
 ```
@@ -264,7 +266,7 @@ Claude / AI Client
 ### OAuth2 (Personal or GWS)
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a project and enable the **Google Drive API** and **Google Sheets API**
+2. Create a project and enable the **Google Drive API**, **Google Sheets API**, and **Google Slides API**
 3. Create OAuth2 credentials (Desktop App type)
 4. Get a refresh token using the OAuth2 playground or your own flow
 5. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
@@ -288,7 +290,7 @@ All write operations (create, update, delete, share) are **disabled by default**
 - **Runtime**: Node.js 18+
 - **Language**: TypeScript (strict mode)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Drive Activity API v2, Drive Labels API v2)
+- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
 - **Validation**: Zod
 - **Package Manager**: pnpm
 - **Test**: Vitest
