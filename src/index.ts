@@ -98,6 +98,23 @@ import {
   resizeDimensionsSchema, resizeDimensions,
 } from "./tools/sheets.js";
 
+// Docs
+import {
+  docsGetDocumentSchema, docsGetDocument,
+  docsCreateDocumentSchema, docsCreateDocument,
+  docsGetContentSchema, docsGetContent,
+  docsInsertTextSchema, docsInsertText,
+  docsDeleteRangeSchema, docsDeleteRange,
+  docsReplaceTextSchema, docsReplaceText,
+  docsBatchUpdateSchema, docsBatchUpdate,
+  docsFormatTextSchema, docsFormatText,
+  docsFormatParagraphSchema, docsFormatParagraph,
+  docsInsertTableSchema, docsInsertTable,
+  docsInsertImageSchema, docsInsertImage,
+  docsInsertPageBreakSchema, docsInsertPageBreak,
+  docsListTabsSchema, docsListTabs,
+} from "./tools/docs.js";
+
 // Slides
 import {
   getSlidesPresentationSchema, getSlidesPresentation,
@@ -146,7 +163,7 @@ import {
 
 const server = new McpServer({
   name: "google-drive",
-  version: "1.1.0",
+  version: "1.3.0",
 });
 
 // ── Universal tools (personal + GWS) ───────────────────────────────────────
@@ -538,6 +555,99 @@ server.tool(
   "Set explicit row height or column width in pixels. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   resizeDimensionsSchema.shape,
   wrapToolHandler(resizeDimensions),
+);
+
+// ── Docs tools ──────────────────────────────────────────────────────────
+
+server.tool(
+  "docs-get-document",
+  "Get Google Docs document metadata including title, revision ID, and tabs summary",
+  docsGetDocumentSchema.shape,
+  wrapToolHandler(docsGetDocument),
+);
+
+server.tool(
+  "docs-create-document",
+  "Create a new Google Docs document, optionally in a specific folder. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsCreateDocumentSchema.shape,
+  wrapToolHandler(docsCreateDocument),
+);
+
+server.tool(
+  "docs-get-content",
+  "Read document content as plain text or structured JSON with character indices. Supports multi-tab documents",
+  docsGetContentSchema.shape,
+  wrapToolHandler(docsGetContent),
+);
+
+server.tool(
+  "docs-insert-text",
+  "Insert text at a specific character index or at the end of a segment. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsInsertTextSchema.shape,
+  wrapToolHandler(docsInsertText),
+);
+
+server.tool(
+  "docs-delete-range",
+  "Delete content within a character index range. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsDeleteRangeSchema.shape,
+  wrapToolHandler(docsDeleteRange),
+);
+
+server.tool(
+  "docs-replace-text",
+  "Find and replace text throughout the document or in specific tabs. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsReplaceTextSchema.shape,
+  wrapToolHandler(docsReplaceText),
+);
+
+server.tool(
+  "docs-batch-update",
+  "Execute raw Docs API batchUpdate requests for advanced operations not covered by other tools. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsBatchUpdateSchema.shape,
+  wrapToolHandler(docsBatchUpdate),
+);
+
+server.tool(
+  "docs-format-text",
+  "Format text style — bold, italic, underline, strikethrough, font, size, color, background color, links. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsFormatTextSchema.shape,
+  wrapToolHandler(docsFormatText),
+);
+
+server.tool(
+  "docs-format-paragraph",
+  "Format paragraph style — alignment, heading level, line spacing, indentation, spacing before/after. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsFormatParagraphSchema.shape,
+  wrapToolHandler(docsFormatParagraph),
+);
+
+server.tool(
+  "docs-insert-table",
+  "Insert a table with specified rows and columns at a position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsInsertTableSchema.shape,
+  wrapToolHandler(docsInsertTable),
+);
+
+server.tool(
+  "docs-insert-image",
+  "Insert an inline image from a URL at a specific position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsInsertImageSchema.shape,
+  wrapToolHandler(docsInsertImage),
+);
+
+server.tool(
+  "docs-insert-page-break",
+  "Insert a page break at a specific position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
+  docsInsertPageBreakSchema.shape,
+  wrapToolHandler(docsInsertPageBreak),
+);
+
+server.tool(
+  "docs-list-tabs",
+  "List all tabs in a multi-tab document with their IDs, titles, and nesting structure",
+  docsListTabsSchema.shape,
+  wrapToolHandler(docsListTabs),
 );
 
 // ── Slides tools ─────────────────────────────────────────────────────────

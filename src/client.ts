@@ -1,4 +1,4 @@
-import { google, drive_v3, driveactivity_v2, drivelabels_v2, sheets_v4, slides_v1 } from "googleapis";
+import { google, drive_v3, driveactivity_v2, drivelabels_v2, sheets_v4, slides_v1, docs_v1 } from "googleapis";
 import { config } from "./config.js";
 
 let driveClient: drive_v3.Drive | null = null;
@@ -6,6 +6,7 @@ let activityClient: driveactivity_v2.Driveactivity | null = null;
 let labelsClient: drivelabels_v2.Drivelabels | null = null;
 let sheetsClient: sheets_v4.Sheets | null = null;
 let slidesClient: slides_v1.Slides | null = null;
+let docsClient: docs_v1.Docs | null = null;
 
 function createAuth() {
   if (config.authMethod === "service-account") {
@@ -78,4 +79,12 @@ export function getSlidesClient(): slides_v1.Slides {
     slidesClient = google.slides({ version: "v1", auth });
   }
   return slidesClient;
+}
+
+export function getDocsClient(): docs_v1.Docs {
+  if (!docsClient) {
+    const auth = createAuth();
+    docsClient = google.docs({ version: "v1", auth });
+  }
+  return docsClient;
 }

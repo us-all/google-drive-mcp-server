@@ -8,11 +8,13 @@ dotenv.config();
 const DEFAULT_SCOPES = [
   "https://www.googleapis.com/auth/drive.readonly",
   "https://www.googleapis.com/auth/drive.activity.readonly",
+  "https://www.googleapis.com/auth/documents.readonly",
 ];
 
 const WRITE_SCOPES = [
   "https://www.googleapis.com/auth/drive",
   "https://www.googleapis.com/auth/drive.activity.readonly",
+  "https://www.googleapis.com/auth/documents",
 ];
 
 function parseScopes(): string[] {

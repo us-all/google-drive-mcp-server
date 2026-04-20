@@ -9,6 +9,7 @@ A Model Context Protocol (MCP) server for Google Drive with **Google Workspace a
 | Feature | Personal | GWS Standard+ | GWS Enterprise |
 |---------|----------|---------------|----------------|
 | File CRUD, Search, Export | ✅ | ✅ | ✅ |
+| **Google Docs (13 tools)** | ✅ | ✅ | ✅ |
 | **Google Sheets (30 tools)** | ✅ | ✅ | ✅ |
 | **Google Slides (20 tools)** | ✅ | ✅ | ✅ |
 | Comments & Revisions | ✅ | ✅ | ✅ |
@@ -87,7 +88,7 @@ pnpm start
 claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 ```
 
-## Tools (82)
+## Tools (95)
 
 ### Drive (24 tools — Personal + GWS)
 
@@ -117,6 +118,41 @@ claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 | `list-revisions` | List file revision history | R |
 | `get-revision` | Get specific revision details | R |
 | `get-activity` | File/folder activity history (edits, views, permission changes) | R |
+
+### Google Docs (13 tools)
+
+**Document**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `docs-get-document` | Document metadata — title, revision ID, tabs summary | R |
+| `docs-create-document` | Create a new document | W |
+| `docs-get-content` | Read content as plain text or structured JSON with indices | R |
+| `docs-list-tabs` | List all tabs with IDs, titles, and nesting structure | R |
+
+**Editing**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `docs-insert-text` | Insert text at a position or end of segment | W |
+| `docs-delete-range` | Delete content within an index range | W |
+| `docs-replace-text` | Find and replace text across document or specific tabs | W |
+| `docs-batch-update` | Raw batchUpdate for advanced operations | W |
+
+**Formatting**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `docs-format-text` | Bold, italic, underline, strikethrough, font, size, color, links | W |
+| `docs-format-paragraph` | Alignment, heading level, spacing, indentation | W |
+
+**Elements**
+
+| Tool | Description | R/W |
+|------|-------------|-----|
+| `docs-insert-table` | Insert a table with rows and columns | W |
+| `docs-insert-image` | Insert an inline image from URL | W |
+| `docs-insert-page-break` | Insert a page break | W |
 
 ### Google Sheets (30 tools)
 
@@ -248,13 +284,14 @@ Claude / AI Client
 │  │               tools/                      │   │
 │  │  files · search · folders · permissions   │   │
 │  │  export · comments · revisions · about    │   │
-│  │  activity · sheets · slides                │   │
+│  │  activity · docs · sheets · slides          │   │
 │  │  shared-drives · labels · approvals       │   │
 │  └───────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
               Google Drive API v3
+              Google Docs API v1
               Google Sheets API v4
               Google Slides API v1
               Drive Activity API v2
@@ -266,7 +303,7 @@ Claude / AI Client
 ### OAuth2 (Personal or GWS)
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a project and enable the **Google Drive API**, **Google Sheets API**, and **Google Slides API**
+2. Create a project and enable the **Google Drive API**, **Google Docs API**, **Google Sheets API**, and **Google Slides API**
 3. Create OAuth2 credentials (Desktop App type)
 4. Get a refresh token using the OAuth2 playground or your own flow
 5. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
@@ -290,7 +327,7 @@ All write operations (create, update, delete, share) are **disabled by default**
 - **Runtime**: Node.js 18+
 - **Language**: TypeScript (strict mode)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
+- **Google API**: `googleapis` (Drive API v3, Docs API v1, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
 - **Validation**: Zod
 - **Package Manager**: pnpm
 - **Test**: Vitest

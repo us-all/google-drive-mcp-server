@@ -9,6 +9,7 @@
 | 기능 | 개인 계정 | GWS Standard+ | GWS Enterprise |
 |------|-----------|---------------|----------------|
 | 파일 CRUD, 검색, 내보내기 | ✅ | ✅ | ✅ |
+| **Google Docs (13개 도구)** | ✅ | ✅ | ✅ |
 | **Google Sheets (30개 도구)** | ✅ | ✅ | ✅ |
 | **Google Slides (20개 도구)** | ✅ | ✅ | ✅ |
 | 댓글 & 리비전 | ✅ | ✅ | ✅ |
@@ -87,7 +88,7 @@ pnpm start
 claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 ```
 
-## 도구 목록 (82개)
+## 도구 목록 (95개)
 
 ### Drive (24개 — 개인 + GWS)
 
@@ -117,6 +118,41 @@ claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
 | `list-revisions` | 파일 리비전 이력 | R |
 | `get-revision` | 특정 리비전 상세 | R |
 | `get-activity` | 파일/폴더 활동 이력 (수정, 조회, 권한 변경) | R |
+
+### Google Docs (13개)
+
+**문서**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `docs-get-document` | 문서 메타데이터 — 제목, 리비전 ID, 탭 요약 | R |
+| `docs-create-document` | 새 문서 생성 | W |
+| `docs-get-content` | 문서 내용을 일반 텍스트 또는 인덱스 포함 구조화 JSON으로 읽기 | R |
+| `docs-list-tabs` | 멀티탭 문서의 모든 탭 목록 (ID, 제목, 중첩 구조) | R |
+
+**편집**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `docs-insert-text` | 특정 위치 또는 세그먼트 끝에 텍스트 삽입 | W |
+| `docs-delete-range` | 인덱스 범위 내 콘텐츠 삭제 | W |
+| `docs-replace-text` | 문서 전체 또는 특정 탭에서 텍스트 찾기 및 바꾸기 | W |
+| `docs-batch-update` | 고급 작업을 위한 raw batchUpdate | W |
+
+**서식**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `docs-format-text` | 볼드, 이탤릭, 밑줄, 취소선, 폰트, 크기, 색상, 링크 | W |
+| `docs-format-paragraph` | 정렬, 제목 수준, 줄 간격, 들여쓰기, 단락 간격 | W |
+
+**요소**
+
+| 도구 | 설명 | R/W |
+|------|------|-----|
+| `docs-insert-table` | 행과 열을 지정하여 테이블 삽입 | W |
+| `docs-insert-image` | URL에서 인라인 이미지 삽입 | W |
+| `docs-insert-page-break` | 페이지 나누기 삽입 | W |
 
 ### Google Sheets (30개)
 
@@ -248,13 +284,14 @@ Claude / AI 클라이언트
 │  │               tools/                      │   │
 │  │  files · search · folders · permissions   │   │
 │  │  export · comments · revisions · about    │   │
-│  │  activity · sheets · slides                │   │
+│  │  activity · docs · sheets · slides          │   │
 │  │  shared-drives · labels · approvals       │   │
 │  └───────────────────────────────────────────┘   │
 └──────────────────────┬───────────────────────────┘
                        │
                        ▼
               Google Drive API v3
+              Google Docs API v1
               Google Sheets API v4
               Google Slides API v1
               Drive Activity API v2
@@ -266,7 +303,7 @@ Claude / AI 클라이언트
 ### OAuth2 (개인 또는 GWS)
 
 1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 생성
-2. **Google Drive API**, **Google Sheets API**, **Google Slides API** 활성화
+2. **Google Drive API**, **Google Docs API**, **Google Sheets API**, **Google Slides API** 활성화
 3. OAuth2 사용자 인증 정보 생성 (데스크톱 앱 유형)
 4. OAuth2 플레이그라운드 등을 사용하여 리프레시 토큰 획득
 5. `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` 설정
@@ -290,7 +327,7 @@ Claude / AI 클라이언트
 - **런타임**: Node.js 18+
 - **언어**: TypeScript (strict 모드)
 - **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
+- **Google API**: `googleapis` (Drive API v3, Docs API v1, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
 - **검증**: Zod
 - **패키지 매니저**: pnpm
 - **테스트**: Vitest

@@ -3,7 +3,7 @@
 ## Tech Stack
 - Node.js 18+, pnpm, TypeScript (strict, ESM)
 - `@modelcontextprotocol/sdk` — MCP protocol
-- `googleapis` — Google Drive API v3, Drive Activity API v2, Drive Labels API v2, Sheets API v4, Slides API v1
+- `googleapis` — Google Drive API v3, Drive Activity API v2, Drive Labels API v2, Sheets API v4, Slides API v1, Docs API v1
 - `zod` — input validation
 - `dotenv` — env loading
 - `vitest` — testing
@@ -42,7 +42,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 - **Service Account**: `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` + optional `GOOGLE_IMPERSONATE_USER`
 - **ADC**: `gcloud auth application-default login --client-id-file=client_secret.json --scopes=...` (auto-detected)
 
-## Tool Categories (82 tools)
+## Tool Categories (95 tools)
 
 | File | Tools |
 |------|-------|
@@ -59,6 +59,10 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 |  | **Structure**: `sheets-insert-dimension`, `sheets-delete-dimension`, `sheets-duplicate-sheet`, `sheets-copy-sheet-to`, `sheets-copy-paste`, `sheets-sort-range`, `sheets-find-replace` |
 |  | **Formatting**: `sheets-format-cells`, `sheets-update-borders`, `sheets-merge-cells`, `sheets-unmerge-cells`, `sheets-auto-resize`, `sheets-resize-dimensions` |
 |  | **Advanced**: `sheets-set-data-validation`, `sheets-add-conditional-format`, `sheets-add-chart`, `sheets-delete-chart`, `sheets-add-protected-range`, `sheets-delete-protected-range`, `sheets-manage-named-range` |
+| `docs.ts` | **Document**: `docs-get-document`, `docs-create-document`, `docs-get-content`, `docs-list-tabs` |
+|  | **Editing**: `docs-insert-text`, `docs-delete-range`, `docs-replace-text`, `docs-batch-update` |
+|  | **Formatting**: `docs-format-text`, `docs-format-paragraph` |
+|  | **Elements**: `docs-insert-table`, `docs-insert-image`, `docs-insert-page-break` |
 | `shared-drives.ts` | `list-shared-drives`, `get-shared-drive`, `create-shared-drive` (GWS) |
 | `labels.ts` | `list-file-labels`, `apply-label`, `remove-label` (GWS) |
 | `approvals.ts` | `list-approvals`, `get-approval` (GWS) |
@@ -67,8 +71,9 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 |  | **Content**: `slides-insert-text`, `slides-replace-text`, `slides-insert-text-box`, `slides-insert-image`, `slides-insert-table`, `slides-update-table-cell`, `slides-insert-shape` |
 |  | **Formatting**: `slides-format-text`, `slides-format-shape`, `slides-resize-element`, `slides-set-slide-background`, `slides-batch-update` |
 
-## 최근 변경사항 (2026-04-03)
+## 최근 변경사항 (2026-04-20)
 
+- **v1.3.0**: Google Docs API v1 지원 추가 — 13개 도구 (문서 관리, 콘텐츠 편집, 서식, 테이블/이미지/페이지 브레이크 삽입, 멀티탭 지원)
 - **v1.2.0**: Google Slides API v1 지원 추가 — 20개 도구 (프레젠테이션 관리, 슬라이드 편집, 콘텐츠 삽입, 서식)
 - **v1.1.1**: Windows ADC 경로 지원 — `%APPDATA%\gcloud\` 경로 인식 추가 (기존 Unix 경로만 지원)
 
