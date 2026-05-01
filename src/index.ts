@@ -163,6 +163,7 @@ import {
 
 import { registry, searchToolsSchema, searchTools, type Category } from "./tool-registry.js";
 import { registerResources } from "./resources.js";
+import { summarizeDocSchema, summarizeDoc } from "./tools/aggregations.js";
 
 const server = new McpServer({
   name: "google-drive",
@@ -872,6 +873,16 @@ tool(
   "[GWS] Get details of a specific approval request including reviewer responses",
   getApprovalSchema.shape,
   wrapToolHandler(getApproval),
+);
+
+// ── Aggregation tools (round-trip elimination) ──────────────────────────────
+currentCategory = "docs";
+
+tool(
+  "summarize-doc",
+  "Aggregated document view: file metadata + extracted plain-text content + permissions + (opt) comments in a single call. Replaces 3-4 round-trips of get-file + docs-get-content + list-permissions + list-comments.",
+  summarizeDocSchema.shape,
+  wrapToolHandler(summarizeDoc),
 );
 
 // ── Meta tools (always enabled) ──────────────────────────────────────────────
