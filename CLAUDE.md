@@ -81,3 +81,19 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 
 - Approvals API: `googleapis` SDK has no typed bindings yet — uses raw `fetch` with auth header extraction
 - `search-files`: Auto-wraps plain text queries in `fullText contains '...'`; pass Drive query syntax directly for advanced searches
+
+## 최근 변경사항 (2026-05-01)
+
+- **v1.8.0**: `@us-all/mcp-toolkit ^0.1.0` 마이그레이션 — tool-registry/extract-fields toolkit 위임. ~66 lines 절감.
+- **v1.7.1**: 추가 MCP Resources (`gdrive://folder/{folderId}`).
+- **v1.7.0**: `summarize-doc` 어그리게이션 도구 — file + content + permissions + comments 1 call.
+- **v1.6.0**: MCP Resources (`gdrive://` URI) — file, spreadsheet, document, presentation.
+- **v1.5.2**: `pnpm token-stats` + CI TOKEN_BUDGET=22000.
+- **v1.5.1**: `extractFields` auto-apply via wrapToolHandler. search/sheets/docs/slides 핵심 read 스키마에 명시적 선언.
+- **v1.5.0**: 토큰 효율 표준 (GD_TOOLS / GD_DISABLE 7 카테고리 + search-tools 메타툴 + extractFields).
+- **v1.4.1**: hono >=4.12.14 보안 패치.
+- **v1.4.0**: `googleapis` 148→171, `google-auth-library` v9→v10. 코드 변경 0줄, 66 unit tests pass.
+
+## 표준 가이드
+
+`@us-all` MCP 작성 표준은 [mcp-toolkit/STANDARD.md](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md)에 있음.
