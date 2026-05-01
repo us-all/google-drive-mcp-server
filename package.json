@@ -1,6 +1,6 @@
 {
   "name": "@us-all/google-drive-mcp",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
   "type": "module",
   "main": "dist/index.js",
@@ -36,6 +36,11 @@
   "author": "us-all",
   "license": "MIT",
   "packageManager": "pnpm@10.30.2",
+  "pnpm": {
+    "overrides": {
+      "hono": ">=4.12.14"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
