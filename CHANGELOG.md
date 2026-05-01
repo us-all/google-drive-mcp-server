@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0 (2026-05-01)
+
+### Added
+- **Token efficiency patterns** (cross-repo standard with openmetadata-mcp v1.3.0, datadog-mcp v1.9.0):
+  - `GD_TOOLS` / `GD_DISABLE` env vars: 7 categories (drive, sheets, docs, slides, shared-drives, labels, approvals)
+  - `search-tools` meta-tool: discover tools by natural-language query
+  - `extractFields` parameter on `list-files` and `get-file`: comma-separated dotted paths with `*` wildcard
+- New unit tests: `tests/extract-fields.test.ts` (3 cases), `tests/tool-registry.test.ts` (4 cases)
+
+### Changed
+- Total tools: 95 → 96 (+search-tools meta)
+- `src/index.ts` refactored: `server.tool()` → `tool()` helper with category filtering
+
 ## 1.4.1 (2026-05-01)
 
 ### Security

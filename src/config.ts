@@ -55,6 +55,13 @@ export interface Config {
   // Options
   allowWrite: boolean;
   scopes: string[];
+  enabledCategories: string[] | null;
+  disabledCategories: string[] | null;
+}
+
+function parseList(raw: string | undefined): string[] | null {
+  if (!raw) return null;
+  return raw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 }
 
 function findAdcFile(): string | null {
@@ -131,6 +138,8 @@ export const config: Config = {
 
   allowWrite: process.env.GOOGLE_DRIVE_ALLOW_WRITE === "true",
   scopes: [],
+  enabledCategories: parseList(process.env.GD_TOOLS),
+  disabledCategories: parseList(process.env.GD_DISABLE),
 };
 
 // Scopes depend on allowWrite, so parse after config is created

@@ -63,6 +63,8 @@ pnpm start
 | `GOOGLE_IMPERSONATE_USER` | No | GWS user email to impersonate (Service Account only) |
 | `GOOGLE_DRIVE_ALLOW_WRITE` | No | Set to `true` to enable write operations. Default: `false` |
 | `GOOGLE_DRIVE_SCOPES` | No | Comma-separated OAuth scopes. Default: `drive.readonly` (or `drive` if write enabled) |
+| `GD_TOOLS` | No | Allowlist of tool categories (e.g. `drive,docs,sheets`). When set, only these load. Categories: `drive`, `sheets`, `docs`, `slides`, `shared-drives`, `labels`, `approvals`. Saves LLM context tokens. |
+| `GD_DISABLE` | No | Denylist of categories (e.g. `slides,labels`). Ignored when `GD_TOOLS` is set. |
 
 ### Claude Desktop
 

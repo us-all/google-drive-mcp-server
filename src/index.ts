@@ -161,15 +161,29 @@ import {
 
 // ── Server setup ────────────────────────────────────────────────────────────
 
+import { registry, searchToolsSchema, searchTools, type Category } from "./tool-registry.js";
+
 const server = new McpServer({
   name: "google-drive",
   version: "1.3.0",
 });
 
+// --- Tool registration with category-based filtering (GD_TOOLS / GD_DISABLE) ---
+let currentCategory: Category = "drive";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function tool(name: string, description: string, schema: any, handler: any): void {
+  registry.register(name, description, currentCategory);
+  if (registry.isEnabled(currentCategory)) {
+    server.tool(name, description, schema, handler);
+  }
+}
+
 // ── Universal tools (personal + GWS) ───────────────────────────────────────
+currentCategory = "drive";
 
 // About
-server.tool(
+tool(
   "get-about",
   "Get Google Drive account information, storage quota, and detected capabilities (personal vs Google Workspace)",
   getAboutSchema.shape,
@@ -177,49 +191,49 @@ server.tool(
 );
 
 // Files
-server.tool(
+tool(
   "list-files",
   "List files and folders in a specific folder. Returns metadata including name, type, size, and modification time. Supports Shared Drives automatically",
   listFilesSchema.shape,
   wrapToolHandler(listFiles),
 );
 
-server.tool(
+tool(
   "get-file",
   "Get detailed metadata for a specific file including description, properties, capabilities, and content restrictions",
   getFileSchema.shape,
   wrapToolHandler(getFile),
 );
 
-server.tool(
+tool(
   "read-file",
   "Read the content of a file. Automatically exports Google Docs to Markdown, Sheets to CSV, Slides to plain text. For binary files, returns content up to 10MB",
   readFileSchema.shape,
   wrapToolHandler(readFile),
 );
 
-server.tool(
+tool(
   "create-file",
   "Create a new file in Google Drive. Supports plain text, Google Docs, Sheets, and other formats. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createFileSchema.shape,
   wrapToolHandler(createFile),
 );
 
-server.tool(
+tool(
   "update-file",
   "Update an existing file's name and/or content. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   updateFileSchema.shape,
   wrapToolHandler(updateFile),
 );
 
-server.tool(
+tool(
   "copy-file",
   "Create a copy of a file, optionally in a different folder with a new name. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   copyFileSchema.shape,
   wrapToolHandler(copyFile),
 );
 
-server.tool(
+tool(
   "delete-file",
   "Move a file to trash or permanently delete it. Default: moves to trash. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   deleteFileSchema.shape,
@@ -227,7 +241,7 @@ server.tool(
 );
 
 // Search
-server.tool(
+tool(
   "search-files",
   "Search files using Google Drive query syntax. Supports full-text search, name, MIME type, modification date, and more. Corpora: 'user' (default), 'domain', 'allDrives' (GWS)",
   searchFilesSchema.shape,
@@ -235,21 +249,21 @@ server.tool(
 );
 
 // Folders
-server.tool(
+tool(
   "create-folder",
   "Create a new folder in Google Drive. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createFolderSchema.shape,
   wrapToolHandler(createFolder),
 );
 
-server.tool(
+tool(
   "move-file",
   "Move a file or folder to a different parent folder. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   moveFileSchema.shape,
   wrapToolHandler(moveFile),
 );
 
-server.tool(
+tool(
   "get-folder-tree",
   "Get a hierarchical tree view of folders and files. Configurable depth (1-5). Useful for understanding Drive structure",
   getFolderTreeSchema.shape,
@@ -257,21 +271,21 @@ server.tool(
 );
 
 // Permissions
-server.tool(
+tool(
   "list-permissions",
   "List all sharing permissions for a file or folder. Shows who has access and their role",
   listPermissionsSchema.shape,
   wrapToolHandler(listPermissions),
 );
 
-server.tool(
+tool(
   "share-file",
   "Share a file or folder with a user, group, domain, or anyone. Supports reader, commenter, writer, and organizer roles. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   shareFileSchema.shape,
   wrapToolHandler(shareFile),
 );
 
-server.tool(
+tool(
   "remove-permission",
   "Remove a sharing permission from a file or folder. Use list-permissions to get the permission ID first. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   removePermissionSchema.shape,
@@ -279,14 +293,14 @@ server.tool(
 );
 
 // Export
-server.tool(
+tool(
   "export-file",
   "Export a Google Docs/Sheets/Slides file to a specific format (PDF, DOCX, CSV, XLSX, PPTX, HTML, Markdown, plain text)",
   exportFileSchema.shape,
   wrapToolHandler(exportFile),
 );
 
-server.tool(
+tool(
   "get-download-link",
   "Get the direct download and web view links for a file",
   getDownloadLinkSchema.shape,
@@ -294,28 +308,28 @@ server.tool(
 );
 
 // Comments
-server.tool(
+tool(
   "list-comments",
   "List comments on a file. Shows author, content, timestamps, and resolution status",
   listCommentsSchema.shape,
   wrapToolHandler(listComments),
 );
 
-server.tool(
+tool(
   "get-comment",
   "Get a specific comment with full details including replies and quoted content",
   getCommentSchema.shape,
   wrapToolHandler(getComment),
 );
 
-server.tool(
+tool(
   "create-comment",
   "Add a comment to a file. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createCommentSchema.shape,
   wrapToolHandler(createComment),
 );
 
-server.tool(
+tool(
   "resolve-comment",
   "Mark a comment as resolved. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   resolveCommentSchema.shape,
@@ -323,14 +337,14 @@ server.tool(
 );
 
 // Revisions
-server.tool(
+tool(
   "list-revisions",
   "List revision history for a file. Shows who modified the file, when, and file size at each revision",
   listRevisionsSchema.shape,
   wrapToolHandler(listRevisions),
 );
 
-server.tool(
+tool(
   "get-revision",
   "Get details of a specific file revision. Use 'head' for the latest revision",
   getRevisionSchema.shape,
@@ -338,7 +352,7 @@ server.tool(
 );
 
 // Activity
-server.tool(
+tool(
   "get-activity",
   "Get the activity history for a file or folder. Shows who viewed, edited, commented, or changed permissions. Works for both personal and GWS accounts",
   getActivitySchema.shape,
@@ -346,211 +360,212 @@ server.tool(
 );
 
 // ── Sheets tools ────────────────────────────────────────────────────────────
+currentCategory = "sheets";
 
-server.tool(
+tool(
   "sheets-get-spreadsheet",
   "Get spreadsheet metadata — title, locale, and list of sheets (tabs) with their dimensions",
   getSpreadsheetSchema.shape,
   wrapToolHandler(getSpreadsheet),
 );
 
-server.tool(
+tool(
   "sheets-get-values",
   "Read cell values from a range in A1 notation (e.g., 'Sheet1!A1:D10'). Supports formatted values, raw values, or formulas",
   getValuesSchema.shape,
   wrapToolHandler(getValues),
 );
 
-server.tool(
+tool(
   "sheets-batch-get-values",
   "Read multiple ranges in a single request. More efficient than multiple get-values calls",
   batchGetValuesSchema.shape,
   wrapToolHandler(batchGetValues),
 );
 
-server.tool(
+tool(
   "sheets-update-values",
   "Write values to a range. Values are parsed as if typed by a user (formulas, dates). Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   updateValuesSchema.shape,
   wrapToolHandler(updateValues),
 );
 
-server.tool(
+tool(
   "sheets-batch-update-values",
   "Write to multiple ranges in one request. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   batchUpdateValuesSchema.shape,
   wrapToolHandler(batchUpdateValues),
 );
 
-server.tool(
+tool(
   "sheets-append-values",
   "Append rows to the end of a table in a sheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   appendValuesSchema.shape,
   wrapToolHandler(appendValues),
 );
 
-server.tool(
+tool(
   "sheets-create-spreadsheet",
   "Create a new spreadsheet with optional sheet names and target folder. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createSpreadsheetSchema.shape,
   wrapToolHandler(createSpreadsheet),
 );
 
-server.tool(
+tool(
   "sheets-manage-sheets",
   "Add, delete, or rename sheets (tabs) within a spreadsheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   manageSheetsSchema.shape,
   wrapToolHandler(manageSheets),
 );
 
-server.tool(
+tool(
   "sheets-clear-values",
   "Clear all values from a range without removing formatting. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   clearValuesSchema.shape,
   wrapToolHandler(clearValues),
 );
 
-server.tool(
+tool(
   "sheets-batch-clear-values",
   "Clear values from multiple ranges at once. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   batchClearValuesSchema.shape,
   wrapToolHandler(batchClearValues),
 );
 
-server.tool(
+tool(
   "sheets-format-cells",
   "Format cells — bold, italic, font, colors, alignment, number format, wrap. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   formatCellsSchema.shape,
   wrapToolHandler(formatCells),
 );
 
-server.tool(
+tool(
   "sheets-update-borders",
   "Set borders on a range — top, bottom, left, right, inner horizontal/vertical. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   updateBordersSchema.shape,
   wrapToolHandler(updateBorders),
 );
 
-server.tool(
+tool(
   "sheets-merge-cells",
   "Merge cells in a range. Supports MERGE_ALL, MERGE_COLUMNS, MERGE_ROWS. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   mergeCellsSchema.shape,
   wrapToolHandler(mergeCells),
 );
 
-server.tool(
+tool(
   "sheets-unmerge-cells",
   "Unmerge previously merged cells in a range. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   unmergeCellsSchema.shape,
   wrapToolHandler(unmergeCells),
 );
 
-server.tool(
+tool(
   "sheets-sort-range",
   "Sort a range by one or more columns, ascending or descending. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   sortRangeSchema.shape,
   wrapToolHandler(sortRange),
 );
 
-server.tool(
+tool(
   "sheets-find-replace",
   "Find and replace text across a sheet or entire spreadsheet. Supports regex. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   findReplaceSchema.shape,
   wrapToolHandler(findReplace),
 );
 
-server.tool(
+tool(
   "sheets-insert-dimension",
   "Insert rows or columns at a specific position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   insertDimensionSchema.shape,
   wrapToolHandler(insertDimension),
 );
 
-server.tool(
+tool(
   "sheets-delete-dimension",
   "Delete rows or columns from a sheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   deleteDimensionSchema.shape,
   wrapToolHandler(deleteDimension),
 );
 
-server.tool(
+tool(
   "sheets-copy-sheet-to",
   "Copy a sheet (tab) to another spreadsheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   copySheetToSchema.shape,
   wrapToolHandler(copySheetTo),
 );
 
-server.tool(
+tool(
   "sheets-duplicate-sheet",
   "Duplicate a sheet within the same spreadsheet. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   duplicateSheetSchema.shape,
   wrapToolHandler(duplicateSheet),
 );
 
-server.tool(
+tool(
   "sheets-auto-resize",
   "Auto-fit column widths or row heights to content. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   autoResizeSchema.shape,
   wrapToolHandler(autoResize),
 );
 
-server.tool(
+tool(
   "sheets-set-data-validation",
   "Set data validation rules — dropdowns, number constraints, date rules, custom formulas. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   setDataValidationSchema.shape,
   wrapToolHandler(setDataValidation),
 );
 
-server.tool(
+tool(
   "sheets-add-conditional-format",
   "Add conditional formatting — highlight rules or color gradient scales. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   addConditionalFormatSchema.shape,
   wrapToolHandler(addConditionalFormat),
 );
 
-server.tool(
+tool(
   "sheets-add-chart",
   "Create an embedded chart (bar, line, area, column, scatter, combo). Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   addChartSchema.shape,
   wrapToolHandler(addChart),
 );
 
-server.tool(
+tool(
   "sheets-delete-chart",
   "Delete an embedded chart by chart ID. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   deleteChartSchema.shape,
   wrapToolHandler(deleteChart),
 );
 
-server.tool(
+tool(
   "sheets-add-protected-range",
   "Protect a range so only specific editors can modify it. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   addProtectedRangeSchema.shape,
   wrapToolHandler(addProtectedRange),
 );
 
-server.tool(
+tool(
   "sheets-delete-protected-range",
   "Remove protection from a range. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   deleteProtectedRangeSchema.shape,
   wrapToolHandler(deleteProtectedRange),
 );
 
-server.tool(
+tool(
   "sheets-manage-named-range",
   "Add, update, or delete named ranges. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   manageNamedRangeSchema.shape,
   wrapToolHandler(manageNamedRange),
 );
 
-server.tool(
+tool(
   "sheets-copy-paste",
   "Copy and paste a range within or across sheets — supports paste values, format, formulas, transpose. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   copyPasteSchema.shape,
   wrapToolHandler(copyPaste),
 );
 
-server.tool(
+tool(
   "sheets-resize-dimensions",
   "Set explicit row height or column width in pixels. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   resizeDimensionsSchema.shape,
@@ -558,92 +573,93 @@ server.tool(
 );
 
 // ── Docs tools ──────────────────────────────────────────────────────────
+currentCategory = "docs";
 
-server.tool(
+tool(
   "docs-get-document",
   "Get Google Docs document metadata including title, revision ID, and tabs summary",
   docsGetDocumentSchema.shape,
   wrapToolHandler(docsGetDocument),
 );
 
-server.tool(
+tool(
   "docs-create-document",
   "Create a new Google Docs document, optionally in a specific folder. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsCreateDocumentSchema.shape,
   wrapToolHandler(docsCreateDocument),
 );
 
-server.tool(
+tool(
   "docs-get-content",
   "Read document content as plain text or structured JSON with character indices. Supports multi-tab documents",
   docsGetContentSchema.shape,
   wrapToolHandler(docsGetContent),
 );
 
-server.tool(
+tool(
   "docs-insert-text",
   "Insert text at a specific character index or at the end of a segment. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsInsertTextSchema.shape,
   wrapToolHandler(docsInsertText),
 );
 
-server.tool(
+tool(
   "docs-delete-range",
   "Delete content within a character index range. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsDeleteRangeSchema.shape,
   wrapToolHandler(docsDeleteRange),
 );
 
-server.tool(
+tool(
   "docs-replace-text",
   "Find and replace text throughout the document or in specific tabs. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsReplaceTextSchema.shape,
   wrapToolHandler(docsReplaceText),
 );
 
-server.tool(
+tool(
   "docs-batch-update",
   "Execute raw Docs API batchUpdate requests for advanced operations not covered by other tools. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsBatchUpdateSchema.shape,
   wrapToolHandler(docsBatchUpdate),
 );
 
-server.tool(
+tool(
   "docs-format-text",
   "Format text style — bold, italic, underline, strikethrough, font, size, color, background color, links. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsFormatTextSchema.shape,
   wrapToolHandler(docsFormatText),
 );
 
-server.tool(
+tool(
   "docs-format-paragraph",
   "Format paragraph style — alignment, heading level, line spacing, indentation, spacing before/after. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsFormatParagraphSchema.shape,
   wrapToolHandler(docsFormatParagraph),
 );
 
-server.tool(
+tool(
   "docs-insert-table",
   "Insert a table with specified rows and columns at a position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsInsertTableSchema.shape,
   wrapToolHandler(docsInsertTable),
 );
 
-server.tool(
+tool(
   "docs-insert-image",
   "Insert an inline image from a URL at a specific position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsInsertImageSchema.shape,
   wrapToolHandler(docsInsertImage),
 );
 
-server.tool(
+tool(
   "docs-insert-page-break",
   "Insert a page break at a specific position. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   docsInsertPageBreakSchema.shape,
   wrapToolHandler(docsInsertPageBreak),
 );
 
-server.tool(
+tool(
   "docs-list-tabs",
   "List all tabs in a multi-tab document with their IDs, titles, and nesting structure",
   docsListTabsSchema.shape,
@@ -651,141 +667,142 @@ server.tool(
 );
 
 // ── Slides tools ─────────────────────────────────────────────────────────
+currentCategory = "slides";
 
-server.tool(
+tool(
   "slides-get-presentation",
   "Get presentation metadata, slides list, and master/layout info",
   getSlidesPresentationSchema.shape,
   wrapToolHandler(getSlidesPresentation),
 );
 
-server.tool(
+tool(
   "slides-create-presentation",
   "Create a new Google Slides presentation. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createPresentationSchema.shape,
   wrapToolHandler(createPresentation),
 );
 
-server.tool(
+tool(
   "slides-duplicate-presentation",
   "Duplicate a presentation via Drive copy. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   duplicatePresentationSchema.shape,
   wrapToolHandler(duplicatePresentation),
 );
 
-server.tool(
+tool(
   "slides-get-slide",
   "Get details of a specific slide including all page elements, shapes, text, images, and tables",
   getSlideSchema.shape,
   wrapToolHandler(getSlide),
 );
 
-server.tool(
+tool(
   "slides-add-slide",
   "Add a new slide with optional layout (predefined or by layoutId). Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   addSlideSchema.shape,
   wrapToolHandler(addSlide),
 );
 
-server.tool(
+tool(
   "slides-delete-slide",
   "Delete a slide by objectId. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   deleteSlideSchema.shape,
   wrapToolHandler(deleteSlide),
 );
 
-server.tool(
+tool(
   "slides-move-slide",
   "Reorder slides within a presentation. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   moveSlideSchema.shape,
   wrapToolHandler(moveSlide),
 );
 
-server.tool(
+tool(
   "slides-duplicate-slide",
   "Duplicate an existing slide within the same presentation. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   duplicateSlideSchema.shape,
   wrapToolHandler(duplicateSlide),
 );
 
-server.tool(
+tool(
   "slides-insert-text",
   "Insert text into an existing text box or shape by objectId. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   insertTextSchema.shape,
   wrapToolHandler(insertText),
 );
 
-server.tool(
+tool(
   "slides-replace-text",
   "Find and replace text across the entire presentation or specific slides. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   replaceTextSchema.shape,
   wrapToolHandler(replaceAllText),
 );
 
-server.tool(
+tool(
   "slides-insert-text-box",
   "Create a new text box with text, position, and size on a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   insertTextBoxSchema.shape,
   wrapToolHandler(insertTextBox),
 );
 
-server.tool(
+tool(
   "slides-insert-image",
   "Insert an image from a URL onto a slide with position and size. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   insertImageSchema.shape,
   wrapToolHandler(insertImage),
 );
 
-server.tool(
+tool(
   "slides-insert-table",
   "Create a table with specified rows and columns on a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   insertTableSchema.shape,
   wrapToolHandler(insertTable),
 );
 
-server.tool(
+tool(
   "slides-update-table-cell",
   "Update text in a specific table cell by row and column index. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   updateTableCellSchema.shape,
   wrapToolHandler(updateTableCell),
 );
 
-server.tool(
+tool(
   "slides-insert-shape",
   "Insert a shape (RECTANGLE, ELLIPSE, ROUND_RECTANGLE, STAR_5, ARROW_LEFT, etc.) onto a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   insertShapeSchema.shape,
   wrapToolHandler(insertShape),
 );
 
-server.tool(
+tool(
   "slides-format-text",
   "Format text style — bold, italic, underline, font family, font size, text color. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   formatTextSchema.shape,
   wrapToolHandler(formatText),
 );
 
-server.tool(
+tool(
   "slides-format-shape",
   "Format shape fill color, border color, and border weight. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   formatShapeSchema.shape,
   wrapToolHandler(formatShape),
 );
 
-server.tool(
+tool(
   "slides-resize-element",
   "Change an element's position and/or size on a slide. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   resizeElementSchema.shape,
   wrapToolHandler(resizeElement),
 );
 
-server.tool(
+tool(
   "slides-set-slide-background",
   "Set a slide's background to a solid color. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   setSlideBackgroundSchema.shape,
   wrapToolHandler(setSlideBackground),
 );
 
-server.tool(
+tool(
   "slides-batch-update",
   "Execute raw Slides API batchUpdate requests for advanced operations not covered by other tools. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   slidesBatchUpdateSchema.shape,
@@ -793,23 +810,24 @@ server.tool(
 );
 
 // ── GWS-only tools ──────────────────────────────────────────────────────────
+currentCategory = "shared-drives";
 
 // Shared Drives
-server.tool(
+tool(
   "list-shared-drives",
   "[GWS] List Shared Drives (Team Drives) accessible to the current user. Requires Google Workspace Business Standard or higher",
   listSharedDrivesSchema.shape,
   wrapToolHandler(listSharedDrives),
 );
 
-server.tool(
+tool(
   "get-shared-drive",
   "[GWS] Get details of a specific Shared Drive including restrictions and capabilities",
   getSharedDriveSchema.shape,
   wrapToolHandler(getSharedDrive),
 );
 
-server.tool(
+tool(
   "create-shared-drive",
   "[GWS] Create a new Shared Drive. Requires Google Workspace Business Standard or higher. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createSharedDriveSchema.shape,
@@ -817,21 +835,22 @@ server.tool(
 );
 
 // Labels
-server.tool(
+currentCategory = "labels";
+tool(
   "list-file-labels",
   "[GWS] List classification labels applied to a file. Labels are structured metadata for compliance and governance. Requires Google Workspace Business Standard or higher",
   listFileLabelsSchema.shape,
   wrapToolHandler(listFileLabels),
 );
 
-server.tool(
+tool(
   "apply-label",
   "[GWS] Apply a classification label to a file with optional field values. Requires Google Workspace Business Standard or higher. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   applyLabelSchema.shape,
   wrapToolHandler(applyLabel),
 );
 
-server.tool(
+tool(
   "remove-label",
   "[GWS] Remove a classification label from a file. Requires Google Workspace Business Standard or higher. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   removeLabelSchema.shape,
@@ -839,18 +858,29 @@ server.tool(
 );
 
 // Approvals
-server.tool(
+currentCategory = "approvals";
+tool(
   "list-approvals",
   "[GWS] List approval requests for a file. Shows approval status, reviewers, and decisions. Requires Google Workspace",
   listApprovalsSchema.shape,
   wrapToolHandler(listApprovals),
 );
 
-server.tool(
+tool(
   "get-approval",
   "[GWS] Get details of a specific approval request including reviewer responses",
   getApprovalSchema.shape,
   wrapToolHandler(getApproval),
+);
+
+// ── Meta tools (always enabled) ──────────────────────────────────────────────
+currentCategory = "meta";
+
+tool(
+  "search-tools",
+  "Discover available tools by natural language query. Returns matching tool names + descriptions across all categories. Use this to navigate the tool surface efficiently — call this first, then call the specific tool you need.",
+  searchToolsSchema.shape,
+  wrapToolHandler(searchTools),
 );
 
 // ── Start server ────────────────────────────────────────────────────────────

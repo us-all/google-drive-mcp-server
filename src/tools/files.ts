@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getDriveClient } from "../client.js";
 import { assertWriteAllowed } from "./utils.js";
+import { applyExtractFields, extractFieldsDescription } from "./extract-fields.js";
 
 const FILE_FIELDS =
   "id,name,mimeType,size,createdTime,modifiedTime,parents,webViewLink,owners,shared,trashed,capabilities,contentRestrictions";
@@ -29,6 +30,7 @@ export const listFilesSchema = z.object({
     .describe(
       "Sort order. Examples: 'modifiedTime desc', 'name', 'createdTime desc'. Default: 'modifiedTime desc'",
     ),
+  extractFields: z.string().optional().describe(extractFieldsDescription),
 });
 
 export async function listFiles(params: z.infer<typeof listFilesSchema>) {
@@ -43,17 +45,19 @@ export async function listFiles(params: z.infer<typeof listFilesSchema>) {
     includeItemsFromAllDrives: true,
   });
 
-  return {
+  const result = {
     files: response.data.files ?? [],
     nextPageToken: response.data.nextPageToken,
     count: response.data.files?.length ?? 0,
   };
+  return applyExtractFields(result, params.extractFields);
 }
 
 // ── get-file ────────────────────────────────────────────────────────────────
 
 export const getFileSchema = z.object({
   fileId: z.string().describe("The ID of the file to retrieve metadata for"),
+  extractFields: z.string().optional().describe(extractFieldsDescription),
 });
 
 export async function getFile(params: z.infer<typeof getFileSchema>) {
@@ -63,7 +67,7 @@ export async function getFile(params: z.infer<typeof getFileSchema>) {
     fields: `${FILE_FIELDS},description,starred,properties,appProperties,shortcutDetails`,
     supportsAllDrives: true,
   });
-  return response.data;
+  return applyExtractFields(response.data, params.extractFields);
 }
 
 // ── read-file ───────────────────────────────────────────────────────────────
