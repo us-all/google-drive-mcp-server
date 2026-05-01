@@ -162,6 +162,7 @@ import {
 // ── Server setup ────────────────────────────────────────────────────────────
 
 import { registry, searchToolsSchema, searchTools, type Category } from "./tool-registry.js";
+import { registerResources } from "./resources.js";
 
 const server = new McpServer({
   name: "google-drive",
@@ -882,6 +883,9 @@ tool(
   searchToolsSchema.shape,
   wrapToolHandler(searchTools),
 );
+
+// ── MCP Resources (gdrive:// URI scheme) ────────────────────────────────────
+registerResources(server);
 
 // ── Start server ────────────────────────────────────────────────────────────
 
