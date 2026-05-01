@@ -1,5 +1,8 @@
 import { z } from "zod";
 import { getDriveClient } from "../client.js";
+import { extractFieldsDescription } from "./extract-fields.js";
+
+const ef = z.string().optional().describe(extractFieldsDescription);
 
 const FILE_FIELDS =
   "id,name,mimeType,size,createdTime,modifiedTime,parents,webViewLink,owners,shared";
@@ -39,6 +42,7 @@ export const searchFilesSchema = z.object({
     .describe(
       "Sort order. Options: 'relevance', 'modifiedTime desc', 'name', 'createdTime desc'. Default: 'relevance'",
     ),
+  extractFields: ef,
 });
 
 export async function searchFiles(

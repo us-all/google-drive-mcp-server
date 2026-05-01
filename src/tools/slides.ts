@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { getSlidesClient, getDriveClient } from "../client.js";
 import { assertWriteAllowed } from "./utils.js";
+import { extractFieldsDescription } from "./extract-fields.js";
+
+const ef = z.string().optional().describe(extractFieldsDescription);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -41,6 +44,7 @@ function generateObjectId(): string {
 
 export const getSlidesPresentationSchema = z.object({
   presentationId: z.string().describe("The ID of the Google Slides presentation"),
+  extractFields: ef,
 });
 
 export async function getSlidesPresentation(

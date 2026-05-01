@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { getSheetsClient, getDriveClient } from "../client.js";
 import { assertWriteAllowed } from "./utils.js";
+import { extractFieldsDescription } from "./extract-fields.js";
+
+const ef = z.string().optional().describe(extractFieldsDescription);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -63,6 +66,7 @@ export const getSpreadsheetSchema = z.object({
     .optional()
     .default(false)
     .describe("Whether to include cell data (can be very large). Default: false"),
+  extractFields: ef,
 });
 
 export async function getSpreadsheet(
@@ -114,6 +118,7 @@ export const getValuesSchema = z.object({
   range: z.string().describe("A1 notation range (e.g., 'Sheet1!A1:D10', 'A1:B5')"),
   valueRenderOption,
   dateTimeRenderOption,
+  extractFields: ef,
 });
 
 export async function getValues(params: z.infer<typeof getValuesSchema>) {
@@ -140,6 +145,7 @@ export const batchGetValuesSchema = z.object({
   ranges: z.array(z.string()).describe("Array of A1 notation ranges to read"),
   valueRenderOption,
   dateTimeRenderOption,
+  extractFields: ef,
 });
 
 export async function batchGetValues(

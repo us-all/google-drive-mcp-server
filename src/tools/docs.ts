@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { getDocsClient, getDriveClient } from "../client.js";
 import { assertWriteAllowed } from "./utils.js";
+import { extractFieldsDescription } from "./extract-fields.js";
+
+const ef = z.string().optional().describe(extractFieldsDescription);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -144,6 +147,7 @@ function makeRange(
 
 export const docsGetDocumentSchema = z.object({
   documentId: z.string().describe("The ID of the Google Docs document"),
+  extractFields: ef,
 });
 
 export async function docsGetDocument(
