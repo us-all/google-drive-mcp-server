@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 (2026-05-01)
+
+### Changed
+- Upgraded `googleapis` 148.0.0 → 171.4.0 (23 minor bumps incl. v165–v171 major lines)
+- `google-auth-library` v9 → v10 pulled in transitively
+- All 66 unit tests pass without code changes — code uses only stable top-level auth surfaces (`GoogleAuth`, `OAuth2`, `getAccessToken`, `getClient`) which were unaffected by the v10 internal API removals (`Transporter`, `options.ts`, `messages.ts`, `additionalOptions`)
+
 ## 1.0.0 (2026-03-26)
 
 ### Added
