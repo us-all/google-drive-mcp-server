@@ -1,6 +1,8 @@
 # Google Drive MCP Server
 
-[한국어](./README_KO.md)
+[![@us-all standard](https://img.shields.io/badge/built%20to-%40us--all%20MCP%20standard-blue)](https://github.com/us-all/datadog-mcp-server/blob/master/STANDARD.md) [한국어](./README_KO.md)
+
+> Authored to the [@us-all MCP Standard](https://github.com/us-all/datadog-mcp-server/blob/master/STANDARD.md) — token-efficient by design.
 
 A Model Context Protocol (MCP) server for Google Drive with **Google Workspace awareness**. Unlike other Drive MCP servers, this one automatically detects your account type and unlocks GWS-exclusive features like Shared Drives, Labels, and Approvals.
 
