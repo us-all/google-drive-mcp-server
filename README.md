@@ -66,6 +66,20 @@ pnpm start
 | `GD_TOOLS` | No | Allowlist of tool categories (e.g. `drive,docs,sheets`). When set, only these load. Categories: `drive`, `sheets`, `docs`, `slides`, `shared-drives`, `labels`, `approvals`. Saves LLM context tokens. |
 | `GD_DISABLE` | No | Denylist of categories (e.g. `slides,labels`). Ignored when `GD_TOOLS` is set. |
 
+### Token Efficiency
+
+With 96 tools, naive setup loads ~18K tokens of tool schema into LLM context. Category toggles drop this dramatically.
+
+**Measured impact** (from `tools/list` JSON length, ~4 chars/token):
+
+| Scenario | Tools loaded | Schema tokens | vs default |
+|----------|--------------|---------------|-----------|
+| default (all categories) | 96 | **18,400** | — |
+| typical (`GD_TOOLS=drive,docs,sheets`) | 68 | 13,700 | −25% |
+| narrow (`GD_TOOLS=drive`) | 25 | **4,000** | **−78%** |
+
+Plus `extractFields` response projection on `list-files`/`get-file` and `search-tools` meta-tool (always enabled) for tool discovery.
+
 ### Claude Desktop
 
 ```json
