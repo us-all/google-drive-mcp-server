@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getDocsClient, getDriveClient } from "../client.js";
 import { assertWriteAllowed } from "./utils.js";
-import { extractFieldsDescription } from "./extract-fields.js";
+import { applyExtractFields, extractFieldsDescription } from "./extract-fields.js";
 
 const ef = z.string().optional().describe(extractFieldsDescription);
 
@@ -150,6 +150,8 @@ export const docsGetDocumentSchema = z.object({
   extractFields: ef,
 });
 
+const GET_DOCUMENT_DEFAULT_FIELDS = "documentId,title,revisionId";
+
 export async function docsGetDocument(
   params: z.infer<typeof docsGetDocumentSchema>,
 ) {
@@ -162,7 +164,7 @@ export async function docsGetDocument(
   const d = response.data;
   const allTabs = flattenTabs((d.tabs ?? []) as Tab[]);
 
-  return {
+  const result = {
     documentId: d.documentId,
     title: d.title,
     revisionId: d.revisionId,
@@ -175,6 +177,8 @@ export async function docsGetDocument(
       parentTabId: t.tabProperties?.parentTabId,
     })),
   };
+
+  return applyExtractFields(result, params.extractFields ?? GET_DOCUMENT_DEFAULT_FIELDS);
 }
 
 // ── docs-create-document ───────────────────────────────────────────────────
@@ -226,7 +230,7 @@ export const docsGetContentSchema = z.object({
   format: z
     .enum(["structured", "plaintext"])
     .default("plaintext")
-    .describe("Output format: 'plaintext' for extracted text, 'structured' for the raw body.content array with indices"),
+    .describe("'plaintext' for text; 'structured' for raw body.content"),
 });
 
 export async function docsGetContent(
@@ -374,7 +378,7 @@ export const docsBatchUpdateSchema = z.object({
   documentId: z.string().describe("The ID of the Google Docs document"),
   requests: z
     .array(z.record(z.string(), z.unknown()))
-    .describe("Array of Docs API batchUpdate request objects. See: https://developers.google.com/docs/api/reference/rest/v1/documents/request"),
+    .describe("Docs API batchUpdate request objects"),
 });
 
 export async function docsBatchUpdate(

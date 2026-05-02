@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getSheetsClient, getDriveClient } from "../client.js";
 import { assertWriteAllowed } from "./utils.js";
-import { extractFieldsDescription } from "./extract-fields.js";
+import { applyExtractFields, extractFieldsDescription } from "./extract-fields.js";
 
 const ef = z.string().optional().describe(extractFieldsDescription);
 
@@ -69,6 +69,8 @@ export const getSpreadsheetSchema = z.object({
   extractFields: ef,
 });
 
+const GET_SPREADSHEET_DEFAULT_FIELDS = "spreadsheetId,title,sheets.*.sheetId,sheets.*.title";
+
 export async function getSpreadsheet(
   params: z.infer<typeof getSpreadsheetSchema>,
 ) {
@@ -82,7 +84,7 @@ export async function getSpreadsheet(
       : "spreadsheetId,properties(title,locale,timeZone),spreadsheetUrl,sheets(properties(sheetId,title,index,sheetType,gridProperties(rowCount,columnCount)))",
   });
 
-  return {
+  const result = {
     spreadsheetId: response.data.spreadsheetId,
     title: response.data.properties?.title,
     locale: response.data.properties?.locale,
@@ -97,6 +99,8 @@ export async function getSpreadsheet(
       columnCount: s.properties?.gridProperties?.columnCount,
     })),
   };
+
+  return applyExtractFields(result, params.extractFields ?? GET_SPREADSHEET_DEFAULT_FIELDS);
 }
 
 // ── sheets-get-values ──────────────────────────────────────────────────────
@@ -105,13 +109,13 @@ const valueRenderOption = z
   .enum(["FORMATTED_VALUE", "UNFORMATTED_VALUE", "FORMULA"])
   .optional()
   .default("FORMATTED_VALUE")
-  .describe("How values should be rendered: FORMATTED_VALUE (default), UNFORMATTED_VALUE, or FORMULA");
+  .describe("Value rendering mode");
 
 const dateTimeRenderOption = z
   .enum(["FORMATTED_STRING", "SERIAL_NUMBER"])
   .optional()
   .default("FORMATTED_STRING")
-  .describe("How dates should be rendered: FORMATTED_STRING (default) or SERIAL_NUMBER");
+  .describe("Date rendering mode");
 
 export const getValuesSchema = z.object({
   spreadsheetId: z.string().describe("The spreadsheet ID"),
@@ -176,7 +180,7 @@ const valueInputOption = z
   .enum(["RAW", "USER_ENTERED"])
   .optional()
   .default("USER_ENTERED")
-  .describe("How input should be interpreted: USER_ENTERED (parses formulas/dates, default) or RAW");
+  .describe("USER_ENTERED parses formulas/dates; RAW writes as-is");
 
 export const updateValuesSchema = z.object({
   spreadsheetId: z.string().describe("The spreadsheet ID"),
@@ -264,7 +268,7 @@ export const appendValuesSchema = z.object({
     .enum(["OVERWRITE", "INSERT_ROWS"])
     .optional()
     .default("INSERT_ROWS")
-    .describe("Whether to insert new rows or overwrite existing data after the table. Default: INSERT_ROWS"),
+    .describe("INSERT_ROWS adds rows; OVERWRITE replaces data after the table"),
 });
 
 export async function appendValues(
@@ -600,7 +604,7 @@ export const mergeCellsSchema = z.object({
     .enum(["MERGE_ALL", "MERGE_COLUMNS", "MERGE_ROWS"])
     .optional()
     .default("MERGE_ALL")
-    .describe("Merge type: MERGE_ALL (default), MERGE_COLUMNS, or MERGE_ROWS"),
+    .describe("Merge mode"),
 });
 
 export async function mergeCells(
@@ -683,11 +687,11 @@ export const findReplaceSchema = z.object({
   find: z.string().describe("The text to find"),
   replacement: z.string().describe("The text to replace with"),
   sheetId: z.coerce.number().optional().describe("Limit to a specific sheet (omit for all sheets)"),
-  allSheets: z.boolean().optional().default(true).describe("Search all sheets. Default: true (ignored if sheetId is set)"),
-  matchCase: z.boolean().optional().default(false).describe("Case-sensitive match. Default: false"),
-  matchEntireCell: z.boolean().optional().default(false).describe("Match entire cell content only. Default: false"),
-  searchByRegex: z.boolean().optional().default(false).describe("Treat 'find' as a regular expression. Default: false"),
-  includeFormulas: z.boolean().optional().default(false).describe("Also search within formulas. Default: false"),
+  allSheets: z.boolean().optional().default(true).describe("Search all sheets (ignored if sheetId set)"),
+  matchCase: z.boolean().optional().default(false).describe("Case-sensitive match"),
+  matchEntireCell: z.boolean().optional().default(false).describe("Match entire cell only"),
+  searchByRegex: z.boolean().optional().default(false).describe("Treat 'find' as regex"),
+  includeFormulas: z.boolean().optional().default(false).describe("Also search formulas"),
 });
 
 export async function findReplace(
@@ -893,9 +897,9 @@ export const setDataValidationSchema = z.object({
   values: z
     .array(z.string())
     .optional()
-    .describe("Values for the rule (e.g., dropdown options for ONE_OF_LIST, or [min, max] for NUMBER_BETWEEN, or [formula] for CUSTOM_FORMULA)"),
-  strict: z.boolean().optional().default(true).describe("Reject invalid input. Default: true"),
-  showCustomUi: z.boolean().optional().default(true).describe("Show dropdown UI for list validations. Default: true"),
+    .describe("Rule values (dropdown options, [min,max], or formula)"),
+  strict: z.boolean().optional().default(true).describe("Reject invalid input"),
+  showCustomUi: z.boolean().optional().default(true).describe("Show dropdown UI"),
   inputMessage: z.string().optional().describe("Help message shown when editing the cell"),
 });
 
@@ -1144,7 +1148,7 @@ export const addProtectedRangeSchema = z.object({
   sheetId: z.coerce.number().describe("Numeric sheet ID"),
   range: z.string().describe("A1 notation range to protect"),
   description: z.string().optional().describe("Description of why this range is protected"),
-  warningOnly: z.boolean().optional().default(false).describe("Show warning instead of blocking edits. Default: false"),
+  warningOnly: z.boolean().optional().default(false).describe("Warn instead of blocking edits"),
   editors: z
     .array(z.string())
     .optional()
@@ -1258,12 +1262,12 @@ export const copyPasteSchema = z.object({
     .enum(["PASTE_NORMAL", "PASTE_VALUES", "PASTE_FORMAT", "PASTE_NO_BORDERS", "PASTE_FORMULA", "PASTE_DATA_VALIDATION", "PASTE_CONDITIONAL_FORMATTING"])
     .optional()
     .default("PASTE_NORMAL")
-    .describe("What to paste. Default: PASTE_NORMAL (everything)"),
+    .describe("What to paste"),
   pasteOrientation: z
     .enum(["NORMAL", "TRANSPOSE"])
     .optional()
     .default("NORMAL")
-    .describe("NORMAL or TRANSPOSE. Default: NORMAL"),
+    .describe("Paste orientation"),
 });
 
 export async function copyPaste(

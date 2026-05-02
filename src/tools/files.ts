@@ -27,9 +27,7 @@ export const listFilesSchema = z.object({
     .string()
     .optional()
     .default("modifiedTime desc")
-    .describe(
-      "Sort order. Examples: 'modifiedTime desc', 'name', 'createdTime desc'. Default: 'modifiedTime desc'",
-    ),
+    .describe("Sort order (e.g. 'modifiedTime desc', 'name', 'createdTime desc')"),
   extractFields: z.string().optional().describe(extractFieldsDescription),
 });
 
@@ -60,6 +58,8 @@ export const getFileSchema = z.object({
   extractFields: z.string().optional().describe(extractFieldsDescription),
 });
 
+const GET_FILE_DEFAULT_FIELDS = "id,name,mimeType,modifiedTime,size,owners,parents";
+
 export async function getFile(params: z.infer<typeof getFileSchema>) {
   const drive = getDriveClient();
   const response = await drive.files.get({
@@ -67,7 +67,7 @@ export async function getFile(params: z.infer<typeof getFileSchema>) {
     fields: `${FILE_FIELDS},description,starred,properties,appProperties,shortcutDetails`,
     supportsAllDrives: true,
   });
-  return applyExtractFields(response.data, params.extractFields);
+  return applyExtractFields(response.data, params.extractFields ?? GET_FILE_DEFAULT_FIELDS);
 }
 
 // ── read-file ───────────────────────────────────────────────────────────────
@@ -96,9 +96,7 @@ export const readFileSchema = z.object({
   mimeType: z
     .string()
     .optional()
-    .describe(
-      "Export MIME type for Google Docs/Sheets/Slides. Auto-detected if omitted. Examples: 'text/plain', 'text/csv', 'application/pdf'",
-    ),
+    .describe("Export MIME type (auto-detected for Google native files)"),
 });
 
 export async function readFile(params: z.infer<typeof readFileSchema>) {
@@ -167,9 +165,7 @@ export const createFileSchema = z.object({
     .string()
     .optional()
     .default("text/plain")
-    .describe(
-      "MIME type of the file. Use 'application/vnd.google-apps.document' for Google Docs, 'application/vnd.google-apps.spreadsheet' for Sheets. Default: 'text/plain'",
-    ),
+    .describe("MIME type. Use 'application/vnd.google-apps.{document|spreadsheet|presentation}' for Google native"),
   parentId: z
     .string()
     .optional()
@@ -283,7 +279,7 @@ export const deleteFileSchema = z.object({
     .boolean()
     .optional()
     .default(false)
-    .describe("If true, permanently deletes the file (skips trash). Default: false (moves to trash)"),
+    .describe("If true, permanently delete (skip trash)"),
 });
 
 export async function deleteFile(params: z.infer<typeof deleteFileSchema>) {

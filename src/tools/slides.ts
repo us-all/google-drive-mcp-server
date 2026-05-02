@@ -570,7 +570,7 @@ export const insertShapeSchema = z.object({
   slideObjectId: z.string().describe("The objectId of the slide"),
   shapeType: z
     .string()
-    .describe("Shape type (e.g., RECTANGLE, ELLIPSE, ROUND_RECTANGLE, STAR_5, ARROW_LEFT, HEART, etc.)"),
+    .describe("Shape type (RECTANGLE, ELLIPSE, ROUND_RECTANGLE, STAR_5, ARROW_LEFT, etc.)"),
   x: z.coerce.number().describe("X position in points"),
   y: z.coerce.number().describe("Y position in points"),
   width: z.coerce.number().describe("Width in points"),
@@ -857,7 +857,7 @@ export const slidesBatchUpdateSchema = z.object({
   presentationId: z.string().describe("The ID of the presentation"),
   requests: z
     .array(z.record(z.string(), z.unknown()))
-    .describe("Array of raw Slides API batchUpdate request objects. See Google Slides API docs for the full request schema"),
+    .describe("Slides API batchUpdate request objects"),
 });
 
 export async function slidesBatchUpdate(

@@ -95,7 +95,7 @@ beforeEach(() => {
 });
 
 describe("sheets-get-spreadsheet", () => {
-  it("returns spreadsheet metadata", async () => {
+  it("returns metadata-only projection by default", async () => {
     mockSheetsGet.mockResolvedValue({
       data: {
         spreadsheetId: "abc123",
@@ -115,16 +115,50 @@ describe("sheets-get-spreadsheet", () => {
       },
     });
 
-    const result = await getSpreadsheet({ spreadsheetId: "abc123", includeGridData: false });
+    const result = await getSpreadsheet({ spreadsheetId: "abc123", includeGridData: false }) as {
+      spreadsheetId?: string;
+      title?: string;
+      sheets?: Array<{ sheetId?: number; title?: string; rowCount?: number }>;
+    };
 
     expect(result.spreadsheetId).toBe("abc123");
     expect(result.title).toBe("My Sheet");
     expect(result.sheets).toHaveLength(1);
     expect(result.sheets![0].title).toBe("Sheet1");
-    expect(result.sheets![0].rowCount).toBe(1000);
+    expect(result.sheets![0].sheetId).toBe(0);
+    // Default projection drops rowCount/columnCount/etc. for token efficiency
+    expect(result.sheets![0].rowCount).toBeUndefined();
     expect(mockSheetsGet).toHaveBeenCalledWith(
       expect.objectContaining({ spreadsheetId: "abc123", includeGridData: false }),
     );
+  });
+
+  it("honors caller-provided extractFields over default projection", async () => {
+    mockSheetsGet.mockResolvedValue({
+      data: {
+        spreadsheetId: "abc123",
+        properties: { title: "My Sheet" },
+        spreadsheetUrl: "https://docs.google.com/spreadsheets/d/abc123",
+        sheets: [
+          {
+            properties: {
+              sheetId: 0,
+              title: "Sheet1",
+              gridProperties: { rowCount: 1000, columnCount: 26 },
+            },
+          },
+        ],
+      },
+    });
+
+    const result = await getSpreadsheet({
+      spreadsheetId: "abc123",
+      includeGridData: false,
+      extractFields: "spreadsheetId,sheets.*.rowCount",
+    }) as { spreadsheetId?: string; sheets?: Array<{ rowCount?: number }> };
+
+    expect(result.spreadsheetId).toBe("abc123");
+    expect(result.sheets![0].rowCount).toBe(1000);
   });
 });
 
