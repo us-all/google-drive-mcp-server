@@ -82,9 +82,10 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 - Approvals API: `googleapis` SDK has no typed bindings yet — uses raw `fetch` with auth header extraction
 - `search-files`: Auto-wraps plain text queries in `fullText contains '...'`; pass Drive query syntax directly for advanced searches
 
-## 최근 변경사항 (2026-05-01)
+## 최근 변경사항
 
-- **v1.8.0**: `@us-all/mcp-toolkit ^0.1.0` 마이그레이션 — tool-registry/extract-fields toolkit 위임. ~66 lines 절감.
+- **v1.8.1** (2026-05-02): `@us-all/mcp-toolkit ^0.2.0` 채택 — 로컬 `sanitize` / `wrapToolHandler` 본문 제거, `createWrapToolHandler` factory로 위임. `redactionPatterns`(Google query-string `key=...`) + `errorExtractors`(WriteBlockedError·GWSFeatureError → passthrough, Google API errors → structured)만 명시.
+- **v1.8.0** (2026-05-01): `@us-all/mcp-toolkit ^0.1.0` 마이그레이션 — tool-registry/extract-fields toolkit 위임. ~66 lines 절감.
 - **v1.7.1**: 추가 MCP Resources (`gdrive://folder/{folderId}`).
 - **v1.7.0**: `summarize-doc` 어그리게이션 도구 — file + content + permissions + comments 1 call.
 - **v1.6.0**: MCP Resources (`gdrive://` URI) — file, spreadsheet, document, presentation.
