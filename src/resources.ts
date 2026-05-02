@@ -1,5 +1,7 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getDriveClient, getSheetsClient, getDocsClient, getSlidesClient } from "./client.js";
+import { getCapabilities } from "./capabilities.js";
+import { requireGWS } from "./tools/utils.js";
 
 /**
  * MCP Resources for hot Google Drive entities.
@@ -8,6 +10,8 @@ import { getDriveClient, getSheetsClient, getDocsClient, getSlidesClient } from 
  *   - gdrive://spreadsheet/{spreadsheetId}   — Sheets metadata
  *   - gdrive://document/{documentId}         — Docs metadata
  *   - gdrive://presentation/{presentationId} — Slides metadata
+ *   - gdrive://shared-drive/{driveId}        — Shared Drive metadata + file count (GWS only)
+ *   - gdrive://about/me                      — Current user's about info (storage, capabilities)
  */
 
 function asJson(uri: string, data: unknown) {
@@ -93,6 +97,90 @@ export function registerResources(server: McpServer): void {
         presentationId: String(vars.presentationId),
       });
       return asJson(uri.toString(), r.data);
+    },
+  );
+
+  server.registerResource(
+    "shared-drive",
+    new ResourceTemplate("gdrive://shared-drive/{driveId}", { list: undefined }),
+    {
+      title: "Google Shared Drive",
+      description: "Shared Drive metadata + immediate file count summary (GWS only)",
+      mimeType: "application/json",
+    },
+    async (uri, vars) => {
+      const caps = getCapabilities();
+      if (caps) requireGWS(caps, "Shared Drives");
+
+      const drive = getDriveClient();
+      const driveId = String(vars.driveId);
+
+      const driveMeta = await drive.drives.get({
+        driveId,
+        fields:
+          "id,name,createdTime,hidden,restrictions,capabilities,backgroundImageLink,colorRgb",
+      });
+
+      // Count immediate (non-recursive) files in the Shared Drive root.
+      const filesList = await drive.files.list({
+        corpora: "drive",
+        driveId,
+        includeItemsFromAllDrives: true,
+        supportsAllDrives: true,
+        q: `'${driveId}' in parents and trashed = false`,
+        fields: "files(id,mimeType),nextPageToken",
+        pageSize: 1000,
+      });
+
+      const files = filesList.data.files ?? [];
+      const folderCount = files.filter(
+        (f) => f.mimeType === "application/vnd.google-apps.folder",
+      ).length;
+      const fileCount = files.length - folderCount;
+
+      return asJson(uri.toString(), {
+        ...driveMeta.data,
+        summary: {
+          immediateFileCount: fileCount,
+          immediateFolderCount: folderCount,
+          immediateTotal: files.length,
+          truncated: Boolean(filesList.data.nextPageToken),
+        },
+      });
+    },
+  );
+
+  server.registerResource(
+    "about-me",
+    "gdrive://about/me",
+    {
+      title: "Current User About Info",
+      description:
+        "Current user's about info — storage quota, capabilities, max upload size, account type",
+      mimeType: "application/json",
+    },
+    async (uri) => {
+      const drive = getDriveClient();
+      const r = await drive.about.get({
+        fields:
+          "user(displayName,emailAddress,photoLink),storageQuota(limit,usage,usageInDrive,usageInDriveTrash),canCreateDrives,maxUploadSize,appInstalled,importFormats,exportFormats,folderColorPalette",
+      });
+
+      const caps = getCapabilities();
+
+      return asJson(uri.toString(), {
+        ...r.data,
+        accountType: caps?.isGWS ? "Google Workspace" : "Personal",
+        domain: caps?.domain,
+        gwsCapabilities: caps
+          ? {
+              sharedDrives: caps.sharedDrives,
+              labels: caps.labels,
+              contentRestrictions: caps.contentRestrictions,
+              driveActivity: caps.driveActivity,
+            }
+          : null,
+      });
     },
   );
 }
