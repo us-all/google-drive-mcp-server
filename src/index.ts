@@ -164,7 +164,12 @@ import {
 import { registry, searchToolsSchema, searchTools, type Category } from "./tool-registry.js";
 import { registerResources } from "./resources.js";
 import { registerPrompts } from "./prompts.js";
-import { summarizeDocSchema, summarizeDoc } from "./tools/aggregations.js";
+import {
+  summarizeDocSchema,
+  summarizeDoc,
+  summarizeSpreadsheetSchema,
+  summarizeSpreadsheet,
+} from "./tools/aggregations.js";
 
 const server = new McpServer({
   name: "google-drive",
@@ -884,6 +889,15 @@ tool(
   "Aggregated document view: file metadata + extracted plain-text content + permissions + (opt) comments in a single call. Replaces 3-4 round-trips of get-file + docs-get-content + list-permissions + list-comments.",
   summarizeDocSchema.shape,
   wrapToolHandler(summarizeDoc),
+);
+
+currentCategory = "sheets";
+
+tool(
+  "summarize-spreadsheet",
+  "Aggregated spreadsheet view: shape (title/locale/timeZone, all tabs with sheetId/title/rowCount/columnCount) + per-tab sample rows (A1:Z<sampleRowCount>, default 5) + named ranges. One call replaces sheets-get-spreadsheet + N × sheets-get-values + named range listing. Per-tab failures recorded in `caveats` (other tabs still return).",
+  summarizeSpreadsheetSchema.shape,
+  wrapToolHandler(summarizeSpreadsheet),
 );
 
 // ── Meta tools (always enabled) ──────────────────────────────────────────────
