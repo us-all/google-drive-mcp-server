@@ -163,6 +163,7 @@ import {
 
 import { registry, searchToolsSchema, searchTools, type Category } from "./tool-registry.js";
 import { registerResources } from "./resources.js";
+import { registerPrompts } from "./prompts.js";
 import { summarizeDocSchema, summarizeDoc } from "./tools/aggregations.js";
 
 const server = new McpServer({
@@ -897,6 +898,9 @@ tool(
 
 // ── MCP Resources (gdrive:// URI scheme) ────────────────────────────────────
 registerResources(server);
+
+// ── MCP Prompts (workflow templates) ────────────────────────────────────────
+registerPrompts(server);
 
 // ── Start server ────────────────────────────────────────────────────────────
 

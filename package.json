@@ -1,6 +1,6 @@
 {
   "name": "@us-all/google-drive-mcp",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
   "type": "module",
   "main": "dist/index.js",
