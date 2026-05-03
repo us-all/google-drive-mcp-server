@@ -84,6 +84,11 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 
 ## 최근 변경사항
 
+- **v1.11.1** (2026-05-03): Wave 5 default-projection 정렬 — `sheets-get-spreadsheet`에 rowCount/columnCount/locale/timeZone 포함, `docs-get-document`에 tabsCount + tabs.*.tabId/title 포함, `list-files`에 get-file와 동일한 slim default 적용 (capabilities/contentRestrictions 드롭, ~80% 사이즈 감소).
+- **v1.11.0** (2026-05-02): `summarize-spreadsheet` 어그리게이션 — metadata + per-tab sample + named ranges 1 call. A1 quote-doubling으로 한글 시트명 안전 처리.
+- **v1.10.0** (2026-05-02): Wave 3 Resources — `gdrive://shared-drive/{driveId}` (GWS-gated), `gdrive://about/me`.
+- **v1.9.0** (2026-05-02): MCP Prompts 4개 — `audit-shared-drive-permissions`, `cleanup-shared-with-me`, `analyze-doc-structure`, `bulk-format-spreadsheet`.
+- **v1.8.2** (2026-05-02): Wave 1 — describe trim 19, 의존성 bumps, fat-read 3개에 default extractFields.
 - **v1.8.1** (2026-05-02): `@us-all/mcp-toolkit ^0.2.0` 채택 — 로컬 `sanitize` / `wrapToolHandler` 본문 제거, `createWrapToolHandler` factory로 위임. `redactionPatterns`(Google query-string `key=...`) + `errorExtractors`(WriteBlockedError·GWSFeatureError → passthrough, Google API errors → structured)만 명시.
 - **v1.8.0** (2026-05-01): `@us-all/mcp-toolkit ^0.1.0` 마이그레이션 — tool-registry/extract-fields toolkit 위임. ~66 lines 절감.
 - **v1.7.1**: 추가 MCP Resources (`gdrive://folder/{folderId}`).
