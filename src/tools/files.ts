@@ -48,8 +48,11 @@ export async function listFiles(params: z.infer<typeof listFilesSchema>) {
     nextPageToken: response.data.nextPageToken,
     count: response.data.files?.length ?? 0,
   };
-  return applyExtractFields(result, params.extractFields);
+  return applyExtractFields(result, params.extractFields ?? LIST_FILES_DEFAULT_FIELDS);
 }
+
+const LIST_FILES_DEFAULT_FIELDS =
+  "count,nextPageToken,files.*.id,files.*.name,files.*.mimeType,files.*.modifiedTime,files.*.size,files.*.owners,files.*.parents";
 
 // ── get-file ────────────────────────────────────────────────────────────────
 

@@ -69,7 +69,8 @@ export const getSpreadsheetSchema = z.object({
   extractFields: ef,
 });
 
-const GET_SPREADSHEET_DEFAULT_FIELDS = "spreadsheetId,title,sheets.*.sheetId,sheets.*.title";
+const GET_SPREADSHEET_DEFAULT_FIELDS =
+  "spreadsheetId,title,locale,timeZone,sheets.*.sheetId,sheets.*.title,sheets.*.rowCount,sheets.*.columnCount";
 
 export async function getSpreadsheet(
   params: z.infer<typeof getSpreadsheetSchema>,

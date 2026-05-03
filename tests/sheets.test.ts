@@ -126,8 +126,12 @@ describe("sheets-get-spreadsheet", () => {
     expect(result.sheets).toHaveLength(1);
     expect(result.sheets![0].title).toBe("Sheet1");
     expect(result.sheets![0].sheetId).toBe(0);
-    // Default projection drops rowCount/columnCount/etc. for token efficiency
-    expect(result.sheets![0].rowCount).toBeUndefined();
+    // Default projection keeps rowCount/columnCount — essential for picking a
+    // valid range without a follow-up call. index/sheetType/spreadsheetUrl
+    // remain dropped.
+    expect(result.sheets![0].rowCount).toBe(1000);
+    expect((result.sheets![0] as { columnCount?: number }).columnCount).toBe(26);
+    expect((result.sheets![0] as { index?: number }).index).toBeUndefined();
     expect(mockSheetsGet).toHaveBeenCalledWith(
       expect.objectContaining({ spreadsheetId: "abc123", includeGridData: false }),
     );

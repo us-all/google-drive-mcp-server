@@ -150,7 +150,8 @@ export const docsGetDocumentSchema = z.object({
   extractFields: ef,
 });
 
-const GET_DOCUMENT_DEFAULT_FIELDS = "documentId,title,revisionId";
+const GET_DOCUMENT_DEFAULT_FIELDS =
+  "documentId,title,revisionId,tabsCount,tabs.*.tabId,tabs.*.title";
 
 export async function docsGetDocument(
   params: z.infer<typeof docsGetDocumentSchema>,
