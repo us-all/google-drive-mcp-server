@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { aggregate } from "@us-all/mcp-toolkit";
 import { getDriveClient, getDocsClient, getSheetsClient } from "../client.js";
 import { extractFieldsDescription } from "./extract-fields.js";
 
@@ -40,27 +41,43 @@ export async function summarizeDoc(params: z.infer<typeof summarizeDocSchema>) {
   const docs = getDocsClient();
   const docId = params.documentId;
 
-  const [metaR, docR, permR, commentsR] = await Promise.allSettled([
-    drive.files.get({
-      fileId: docId,
-      fields: "id,name,mimeType,createdTime,modifiedTime,owners,size,webViewLink,description,starred",
-      supportsAllDrives: true,
-    }),
-    params.includeContent
-      ? docs.documents.get({ documentId: docId, includeTabsContent: true })
-      : Promise.resolve(null),
-    params.includePermissions
-      ? drive.permissions.list({ fileId: docId, fields: "permissions(id,type,role,emailAddress,displayName)", supportsAllDrives: true })
-      : Promise.resolve(null),
-    params.includeComments
-      ? drive.comments.list({ fileId: docId, fields: "comments(id,content,author,createdTime,resolved)", pageSize: 100 })
-      : Promise.resolve(null),
-  ]);
+  const caveats: string[] = [];
 
-  const meta = metaR.status === "fulfilled" ? metaR.value?.data : null;
-  const doc = docR.status === "fulfilled" && docR.value ? docR.value.data : null;
-  const perms = permR.status === "fulfilled" && permR.value ? permR.value.data : null;
-  const comments = commentsR.status === "fulfilled" && commentsR.value ? commentsR.value.data : null;
+  const fetched = await aggregate(
+    {
+      meta: () =>
+        drive.files.get({
+          fileId: docId,
+          fields: "id,name,mimeType,createdTime,modifiedTime,owners,size,webViewLink,description,starred",
+          supportsAllDrives: true,
+        }),
+      doc: params.includeContent
+        ? () => docs.documents.get({ documentId: docId, includeTabsContent: true })
+        : () => Promise.resolve(null),
+      perms: params.includePermissions
+        ? () =>
+            drive.permissions.list({
+              fileId: docId,
+              fields: "permissions(id,type,role,emailAddress,displayName)",
+              supportsAllDrives: true,
+            })
+        : () => Promise.resolve(null),
+      comments: params.includeComments
+        ? () =>
+            drive.comments.list({
+              fileId: docId,
+              fields: "comments(id,content,author,createdTime,resolved)",
+              pageSize: 100,
+            })
+        : () => Promise.resolve(null),
+    },
+    caveats,
+  );
+
+  const meta = fetched.meta?.data ?? null;
+  const doc = fetched.doc?.data ?? null;
+  const perms = fetched.perms?.data ?? null;
+  const comments = fetched.comments?.data ?? null;
 
   const text = doc ? extractText(doc as DocsBody) : null;
 
@@ -77,6 +94,7 @@ export async function summarizeDoc(params: z.infer<typeof summarizeDocSchema>) {
       sharedWith: (perms as { permissions?: unknown[] } | null)?.permissions?.length ?? 0,
       commentCount: (comments as { comments?: unknown[] } | null)?.comments?.length ?? 0,
     },
+    caveats,
   };
 }
 

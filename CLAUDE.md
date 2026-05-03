@@ -84,6 +84,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 
 ## 최근 변경사항
 
+- **v1.11.3** (2026-05-03): `@us-all/mcp-toolkit ^1.1.0` 채택 + `aggregate()` 헬퍼로 `summarize-doc` 마이그레이션 + caveats 노출 추가. `summarize-spreadsheet`는 metadata try/catch + variable-N sample fetch 패턴이라 대상 외.
 - **v1.11.2** (2026-05-03): `@us-all/mcp-toolkit ^1.0.0` 핀 업데이트. toolkit API freeze (semver 1.x 보장 시작) — 코드 변경 0줄, 74/74 테스트 통과.
 - **v1.11.1** (2026-05-03): Wave 5 default-projection 정렬 — `sheets-get-spreadsheet`에 rowCount/columnCount/locale/timeZone 포함, `docs-get-document`에 tabsCount + tabs.*.tabId/title 포함, `list-files`에 get-file와 동일한 slim default 적용 (capabilities/contentRestrictions 드롭, ~80% 사이즈 감소).
 - **v1.11.0** (2026-05-02): `summarize-spreadsheet` 어그리게이션 — metadata + per-tab sample + named ranges 1 call. A1 quote-doubling으로 한글 시트명 안전 처리.
