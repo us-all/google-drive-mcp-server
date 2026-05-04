@@ -1,86 +1,52 @@
 # Google Drive MCP Server
 
+> **The Workspace power-editing MCP — formula-aware Sheets, full Slides editing, shared-drive audits the read-only Claude.ai connector deliberately won't ship.**
+>
+> 96 tools across Drive (24) + Docs (13) + Sheets (30) + Slides (20) + GWS admin (8) + aggregations (2). Service Account + Domain-Wide Delegation for org-scale automation. GWS-aware capability detection — features auto-unlock for Workspace accounts.
+
+[![npm](https://img.shields.io/npm/v/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
+[![downloads](https://img.shields.io/npm/dm/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
+[![tools](https://img.shields.io/badge/tools-96-blue)](#tools)
 [![@us-all standard](https://img.shields.io/badge/built%20to-%40us--all%20MCP%20standard-blue)](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md)
 
-> Authored to the [@us-all MCP Standard](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md) — token-efficient by design.
+## What it does that others don't
 
-A Model Context Protocol (MCP) server for Google Drive with **Google Workspace awareness**. Unlike other Drive MCP servers, this one automatically detects your account type and unlocks GWS-exclusive features like Shared Drives, Labels, and Approvals.
+- **Deep Sheets editing** — charts, conditional formats, protected ranges, named ranges, data validation, borders, merge, sort, find/replace, formulas, A1-quote-doubling for CJK tab names. The 1st-party Workspace connector reads Sheets as CSV — formulas don't survive.
+- **Full Slides editing** — presentations, slides, shapes, tables, images, formatting. Not in the connector at all.
+- **Shared-Drive admin tooling** — `list-shared-drives`, `get-shared-drive`, `create-shared-drive`, list/share/remove permissions, file activity, labels, approvals. Workspace governance surface the connector deliberately doesn't expose.
+- **3 auth modes** — OAuth2 (personal or GWS), Service Account + Domain-Wide Delegation (org-scale), Application Default Credentials (auto-detected).
+- **Aggregation tools** — `summarize-spreadsheet` (metadata + per-tab sample + named ranges in one call), `summarize-doc` (file + content + permissions + comments).
+- **MCP Prompts** (4) — `audit-shared-drive-permissions`, `cleanup-shared-with-me`, `analyze-doc-structure`, `bulk-format-spreadsheet`.
+- **GWS-aware** — `capabilities.ts` detects account type on startup; GWS-only tools return clear errors for personal accounts instead of mysterious 403s.
 
-## Highlights
+## Try this — 5 prompts
 
-| Feature | Personal | GWS Standard+ | GWS Enterprise |
-|---------|----------|---------------|----------------|
-| File CRUD, Search, Export | ✅ | ✅ | ✅ |
-| **Google Docs (13 tools)** | ✅ | ✅ | ✅ |
-| **Google Sheets (30 tools)** | ✅ | ✅ | ✅ |
-| **Google Slides (20 tools)** | ✅ | ✅ | ✅ |
-| Comments & Revisions | ✅ | ✅ | ✅ |
-| Drive Activity | ✅ | ✅ | ✅ |
-| Content Restrictions | ✅ | ✅ | ✅ |
-| **Shared Drives** | — | ✅ | ✅ |
-| **Labels (Classification)** | — | ✅ | ✅ |
-| **Approvals** | — | ✅ | ✅ |
-| **Domain-wide Delegation** | — | ✅ | ✅ |
+Connect the server to Claude Desktop or Claude Code, then paste any of these:
 
-## Quick Start
+1. **Shared-drive permission audit** — *"Audit external shares across all my Shared Drives. List people outside `us-all.co.kr` who have access to anything. Group by drive, sort by access level."*
+2. **Bulk conditional formatting** — *"Apply this conditional format to column `amount` across every `sales-*` spreadsheet in my drive: red if <0, yellow if 0–100, green if >100."*
+3. **Slides from Doc outline** — *"Convert this Google Doc's outline into a 12-slide presentation: title slide, then 1 slide per H2 with H3 bullet points, end with a Q&A slide. Use the company template."*
+4. **Doc structure analysis** — *"Analyze this Doc's structure: heading hierarchy, internal vs external link health, image alt-text coverage. Suggest 3 concrete improvements."*
+5. **Cleanup shared-with-me** — *"Find files shared with me more than 180 days ago that I never opened. List them with sharer, last modified, and a guess at whether to keep."*
 
-### Option 1: npx
+## When to use this vs alternatives
 
-```bash
-# OAuth2 (personal or GWS)
-GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... GOOGLE_REFRESH_TOKEN=... \
-  npx @us-all/google-drive-mcp
+| | Anthropic 1st-party Workspace connector | taylorwilsdon/google_workspace_mcp | xing5/mcp-google-sheets | `@us-all/google-drive-mcp` (this) |
+|--|---|---|---|---|
+| Stars / availability | n/a (Claude.ai built-in, Feb 2026) | 2.3K★ | 836★ | — |
+| Scope | Drive read + Sheets-as-CSV read | Gmail+Calendar+Drive+Docs+Sheets+Slides+Forms+Chat+Tasks+Contacts+Apps Script | Sheets only | Drive + Docs + Sheets + Slides + GWS admin |
+| Sheets formula editing | ❌ (CSV round-trip loses formulas) | ✅ basic | ✅ specialist | ✅ deep (charts/conditional/named ranges) |
+| Slides editing | ❌ | ✅ | ❌ | ✅ deep |
+| Shared-drive admin | partial | ✅ | ❌ | ✅ deep |
+| Folder operations | ❌ | ✅ | ❌ | ✅ |
+| Aggregation tools | ❌ | ❌ | ❌ | ✅ `summarize-spreadsheet`, `summarize-doc` |
+| MCP Prompts | ❌ | ❌ | ❌ | ✅ 4 |
+| Auth modes | managed OAuth | OAuth + SA + stateless | SA / OAuth / ADC | OAuth + SA + DWD + ADC |
+| Transport | n/a (Claude.ai-only) | stdio + HTTP | stdio | stdio |
 
-# Service Account with domain-wide delegation (GWS)
-GOOGLE_SERVICE_ACCOUNT_KEY_PATH=./service-account.json GOOGLE_IMPERSONATE_USER=user@company.com \
-  npx @us-all/google-drive-mcp
-```
+**Use the 1st-party connector** for zero-config Drive read flows in Claude.ai. **Use taylorwilsdon** if you need the full Workspace surface (Gmail / Calendar / Forms etc.). **Use this server** for Drive + Docs + Sheets + Slides power-editing, shared-drive governance, and bulk operations the connector can't do.
 
-### Option 2: Docker
-
-```bash
-docker run -i --env-file .env ghcr.io/us-all/google-drive-mcp-server
-```
-
-### Option 3: From source
-
-```bash
-git clone https://github.com/us-all/google-drive-mcp-server.git
-cd google-drive-mcp-server
-pnpm install
-pnpm run build
-pnpm start
-```
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `GOOGLE_CLIENT_ID` | OAuth2 | OAuth2 Client ID |
-| `GOOGLE_CLIENT_SECRET` | OAuth2 | OAuth2 Client Secret |
-| `GOOGLE_REFRESH_TOKEN` | OAuth2 | OAuth2 Refresh Token |
-| `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` | SA | Path to service account JSON key file |
-| `GOOGLE_IMPERSONATE_USER` | No | GWS user email to impersonate (Service Account only) |
-| `GOOGLE_DRIVE_ALLOW_WRITE` | No | Set to `true` to enable write operations. Default: `false` |
-| `GOOGLE_DRIVE_SCOPES` | No | Comma-separated OAuth scopes. Default: `drive.readonly` (or `drive` if write enabled) |
-| `GD_TOOLS` | No | Allowlist of tool categories (e.g. `drive,docs,sheets`). When set, only these load. Categories: `drive`, `sheets`, `docs`, `slides`, `shared-drives`, `labels`, `approvals`. Saves LLM context tokens. |
-| `GD_DISABLE` | No | Denylist of categories (e.g. `slides,labels`). Ignored when `GD_TOOLS` is set. |
-
-### Token Efficiency
-
-With 96 tools, naive setup loads ~18K tokens of tool schema into LLM context. Category toggles drop this dramatically.
-
-**Measured impact** (from `tools/list` JSON length, ~4 chars/token):
-
-| Scenario | Tools loaded | Schema tokens | vs default |
-|----------|--------------|---------------|-----------|
-| default (all categories) | 96 | **18,400** | — |
-| typical (`GD_TOOLS=drive,docs,sheets`) | 68 | 13,700 | −25% |
-| narrow (`GD_TOOLS=drive`) | 25 | **4,000** | **−78%** |
-
-Plus `extractFields` response projection on `list-files`/`get-file` and `search-tools` meta-tool (always enabled) for tool discovery.
+## Install
 
 ### Claude Desktop
 
@@ -91,9 +57,10 @@ Plus `extractFields` response projection on `list-files`/`get-file` and `search-
       "command": "npx",
       "args": ["-y", "@us-all/google-drive-mcp"],
       "env": {
-        "GOOGLE_CLIENT_ID": "your-client-id",
-        "GOOGLE_CLIENT_SECRET": "your-client-secret",
-        "GOOGLE_REFRESH_TOKEN": "your-refresh-token"
+        "GOOGLE_CLIENT_ID": "<your-client-id>",
+        "GOOGLE_CLIENT_SECRET": "<your-client-secret>",
+        "GOOGLE_REFRESH_TOKEN": "<your-refresh-token>",
+        "GOOGLE_DRIVE_ALLOW_WRITE": "true"
       }
     }
   }
@@ -103,257 +70,191 @@ Plus `extractFields` response projection on `list-files`/`get-file` and `search-
 ### Claude Code
 
 ```bash
-claude mcp add google-drive -- npx -y @us-all/google-drive-mcp
+claude mcp add google-drive -s user -- npx -y @us-all/google-drive-mcp
 ```
 
-## Tools (95)
+(Set env vars separately or in `.mcp.json`.)
 
-### Drive (24 tools — Personal + GWS)
+### Docker
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `get-about` | Account info, storage quota, detected capabilities | R |
-| `list-files` | List files in a folder | R |
-| `get-file` | File metadata with properties and capabilities | R |
-| `read-file` | Read file content (auto-exports Google Docs → Markdown, Sheets → CSV) | R |
-| `create-file` | Create a new file | W |
-| `update-file` | Update file name/content | W |
-| `copy-file` | Copy a file | W |
-| `delete-file` | Trash or permanently delete | W |
-| `search-files` | Full-text and metadata search with Drive query syntax | R |
-| `create-folder` | Create a folder | W |
-| `move-file` | Move file/folder to another parent | W |
-| `get-folder-tree` | Hierarchical folder tree (depth 1-5) | R |
-| `list-permissions` | List sharing permissions | R |
-| `share-file` | Share with user/group/domain/anyone | W |
-| `remove-permission` | Remove a sharing permission | W |
-| `export-file` | Export Google Docs/Sheets/Slides to PDF, DOCX, CSV, etc. | R |
-| `get-download-link` | Get download and view links | R |
-| `list-comments` | List comments on a file | R |
-| `get-comment` | Get comment details with replies | R |
-| `create-comment` | Add a comment | W |
-| `resolve-comment` | Mark a comment as resolved | W |
-| `list-revisions` | List file revision history | R |
-| `get-revision` | Get specific revision details | R |
-| `get-activity` | File/folder activity history (edits, views, permission changes) | R |
+```bash
+docker run --rm -i --env-file .env ghcr.io/us-all/google-drive-mcp-server
+```
 
-### Google Docs (13 tools)
+### Build from source
 
-**Document**
+```bash
+git clone https://github.com/us-all/google-drive-mcp-server.git
+cd google-drive-mcp-server && pnpm install && pnpm build
+node dist/index.js
+```
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `docs-get-document` | Document metadata — title, revision ID, tabs summary | R |
-| `docs-create-document` | Create a new document | W |
-| `docs-get-content` | Read content as plain text or structured JSON with indices | R |
-| `docs-list-tabs` | List all tabs with IDs, titles, and nesting structure | R |
+## Auth setup
 
-**Editing**
+### OAuth2 (personal or GWS)
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `docs-insert-text` | Insert text at a position or end of segment | W |
-| `docs-delete-range` | Delete content within an index range | W |
-| `docs-replace-text` | Find and replace text across document or specific tabs | W |
-| `docs-batch-update` | Raw batchUpdate for advanced operations | W |
+1. [Google Cloud Console](https://console.cloud.google.com/) → create project
+2. Enable **Drive API**, **Docs API**, **Sheets API**, **Slides API**, **Drive Activity API**, **Drive Labels API**
+3. Create OAuth2 credentials (Desktop App)
+4. Get a refresh token (OAuth2 playground or your own flow)
+5. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
 
-**Formatting**
+### Service Account + Domain-Wide Delegation (org-scale)
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `docs-format-text` | Bold, italic, underline, strikethrough, font, size, color, links | W |
-| `docs-format-paragraph` | Alignment, heading level, spacing, indentation | W |
+1. Create a Service Account in Google Cloud Console
+2. Download the JSON key
+3. Workspace Admin Console → **Security → API Controls → Domain-Wide Delegation** → add the SA's Client ID + grant required scopes
+4. Set `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` and `GOOGLE_IMPERSONATE_USER`
 
-**Elements**
+### Application Default Credentials (zero-config)
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `docs-insert-table` | Insert a table with rows and columns | W |
-| `docs-insert-image` | Insert an inline image from URL | W |
-| `docs-insert-page-break` | Insert a page break | W |
+`gcloud auth application-default login --client-id-file=client_secret.json --scopes=...` — auto-detected on startup. Windows ADC paths (`%APPDATA%\gcloud\`) supported.
 
-### Google Sheets (30 tools)
+## Configuration
 
-**Data**
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `GOOGLE_CLIENT_ID` | OAuth2 | — | OAuth2 Client ID |
+| `GOOGLE_CLIENT_SECRET` | OAuth2 | — | OAuth2 Client Secret |
+| `GOOGLE_REFRESH_TOKEN` | OAuth2 | — | OAuth2 Refresh Token |
+| `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` | SA | — | Path to service-account JSON key |
+| `GOOGLE_IMPERSONATE_USER` | ❌ | — | GWS user email to impersonate (SA only) |
+| `GOOGLE_DRIVE_ALLOW_WRITE` | ❌ | `false` | Set `true` to enable mutations |
+| `GOOGLE_DRIVE_SCOPES` | ❌ | `drive.readonly` (or `drive` if write enabled) | Comma-sep OAuth scopes override |
+| `GD_TOOLS` | ❌ | — | Comma-sep allowlist of categories. Biggest token saver. |
+| `GD_DISABLE` | ❌ | — | Comma-sep denylist. Ignored when `GD_TOOLS` is set. |
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `sheets-get-spreadsheet` | Spreadsheet metadata — title, locale, sheets (tabs) | R |
-| `sheets-get-values` | Read cell values from a range (A1 notation) | R |
-| `sheets-batch-get-values` | Read multiple ranges in one request | R |
-| `sheets-update-values` | Write values to a range | W |
-| `sheets-batch-update-values` | Write to multiple ranges in one request | W |
-| `sheets-append-values` | Append rows to the end of a table | W |
-| `sheets-clear-values` | Clear values from a range | W |
-| `sheets-batch-clear-values` | Clear multiple ranges at once | W |
-| `sheets-create-spreadsheet` | Create a new spreadsheet | W |
-| `sheets-manage-sheets` | Add, delete, or rename sheets (tabs) | W |
+**Categories** (7): `drive`, `sheets`, `docs`, `slides`, `shared-drives`, `labels`, `approvals`. Plus always-on `meta`.
 
-**Structure**
+### Token efficiency
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `sheets-insert-dimension` | Insert rows or columns at a position | W |
-| `sheets-delete-dimension` | Delete rows or columns | W |
-| `sheets-duplicate-sheet` | Duplicate a sheet within the spreadsheet | W |
-| `sheets-copy-sheet-to` | Copy a sheet to another spreadsheet | W |
-| `sheets-copy-paste` | Copy/paste ranges with paste type control | W |
-| `sheets-sort-range` | Sort a range by columns | W |
-| `sheets-find-replace` | Find and replace text (supports regex) | W |
+| Scenario | Tools | Schema tokens | vs default |
+|----------|------:|--------------:|-----------:|
+| default (all categories) | 96 | 18,400 | — |
+| typical (`GD_TOOLS=drive,docs,sheets`) | 68 | 13,700 | −25% |
+| narrow (`GD_TOOLS=drive`) | 25 | **4,000** | **−78%** |
 
-**Formatting**
+`extractFields` projection on `list-files`/`get-file`/`sheets-get-spreadsheet`/`docs-get-document` (with `tabsCount`, `rowCount`, `columnCount`, `locale`, `timeZone` defaults). `list-files` slim default trims ~80% (drops `capabilities` 40-bool object + `contentRestrictions`).
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `sheets-format-cells` | Bold, italic, font, colors, alignment, number format | W |
-| `sheets-update-borders` | Set borders on a range | W |
-| `sheets-merge-cells` | Merge cells (all, columns, or rows) | W |
-| `sheets-unmerge-cells` | Unmerge previously merged cells | W |
-| `sheets-auto-resize` | Auto-fit column widths or row heights | W |
-| `sheets-resize-dimensions` | Set explicit row height or column width | W |
+## GWS detection
 
-**Advanced**
+`capabilities.ts` detects account type at startup via `about.get()` + domain check:
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `sheets-set-data-validation` | Dropdowns, number constraints, custom formulas | W |
-| `sheets-add-conditional-format` | Highlight rules or color gradient scales | W |
-| `sheets-add-chart` | Create embedded charts (bar, line, column, scatter, etc.) | W |
-| `sheets-delete-chart` | Delete an embedded chart | W |
-| `sheets-add-protected-range` | Protect a range (restrict editors) | W |
-| `sheets-delete-protected-range` | Remove range protection | W |
-| `sheets-manage-named-range` | Add, update, or delete named ranges | W |
+| Feature | Personal | GWS Standard+ | GWS Enterprise |
+|---|---|---|---|
+| File CRUD / Search / Export | ✅ | ✅ | ✅ |
+| Docs / Sheets / Slides editing | ✅ | ✅ | ✅ |
+| Comments & Revisions | ✅ | ✅ | ✅ |
+| Drive Activity | ✅ | ✅ | ✅ |
+| **Shared Drives** | — | ✅ | ✅ |
+| **Labels (classification)** | — | ✅ | ✅ |
+| **Approvals** | — | ✅ | ✅ |
+| **Domain-Wide Delegation** | — | ✅ | ✅ |
 
-### Google Slides (20 tools)
+GWS-only tools throw `GWSFeatureError` with a clear message for personal accounts — no mysterious 403s.
 
-**Presentation**
+## MCP Prompts (4)
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `slides-get-presentation` | Get presentation metadata, slides list, and layout info | R |
-| `slides-create-presentation` | Create a new presentation | W |
-| `slides-duplicate-presentation` | Duplicate an existing presentation (via Drive copy) | W |
+Workflow templates available via MCP `prompts/list`:
 
-**Slide Management**
+- `audit-shared-drive-permissions` — fleet-wide external-share audit; flag access-level outliers.
+- `cleanup-shared-with-me` — find untouched stale shares + suggest cleanup.
+- `analyze-doc-structure` — heading hierarchy + link health + alt-text coverage.
+- `bulk-format-spreadsheet` — apply consistent format across many sheets/tabs.
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `slides-get-slide` | Get slide details with all elements | R |
-| `slides-add-slide` | Add a new slide with optional layout | W |
-| `slides-delete-slide` | Delete a slide | W |
-| `slides-move-slide` | Reorder a slide | W |
-| `slides-duplicate-slide` | Duplicate a slide within the presentation | W |
+## MCP Resources
 
-**Content**
+URI-based read-only access:
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `slides-insert-text` | Insert text into an existing text box | W |
-| `slides-replace-text` | Find and replace text across the presentation | W |
-| `slides-insert-text-box` | Create a new text box with text | W |
-| `slides-insert-image` | Insert an image from URL | W |
-| `slides-insert-table` | Create a table | W |
-| `slides-update-table-cell` | Update text in a table cell | W |
-| `slides-insert-shape` | Insert a shape (rectangle, ellipse, etc.) | W |
+- `gdrive://file/{fileId}`
+- `gdrive://spreadsheet/{spreadsheetId}`
+- `gdrive://document/{documentId}`
+- `gdrive://presentation/{presentationId}`
+- `gdrive://folder/{folderId}`
+- `gdrive://shared-drive/{driveId}` (GWS-gated)
+- `gdrive://about/me`
 
-**Formatting**
+## Tools (96)
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `slides-format-text` | Text style (font, size, color, bold, italic) | W |
-| `slides-format-shape` | Shape fill color and border | W |
-| `slides-resize-element` | Change element size and position | W |
-| `slides-set-slide-background` | Set slide background color | W |
-| `slides-batch-update` | Raw batchUpdate for advanced operations | W |
+7 categories. Use `search-tools` to discover at runtime; full list collapsed below.
 
-### GWS-Only (8 tools — Google Workspace)
+| Category | Tools |
+|----------|------:|
+| Sheets (data / structure / formatting / advanced) | 30 |
+| Drive (files / search / folders / permissions / export / comments / revisions / activity) | 24 |
+| Slides (presentation / slide mgmt / content / formatting) | 20 |
+| Docs (document / editing / formatting / elements) | 13 |
+| GWS-only (shared drives / labels / approvals) | 8 |
+| Aggregations (`summarize-spreadsheet`, `summarize-doc`) | 2 |
+| Meta (`search-tools`) | 1 |
 
-| Tool | Description | R/W |
-|------|-------------|-----|
-| `list-shared-drives` | List accessible Shared Drives | R |
-| `get-shared-drive` | Shared Drive details and capabilities | R |
-| `create-shared-drive` | Create a new Shared Drive | W |
-| `list-file-labels` | List classification labels on a file | R |
-| `apply-label` | Apply a label with field values | W |
-| `remove-label` | Remove a label from a file | W |
-| `list-approvals` | List file approval requests | R |
-| `get-approval` | Get approval details and reviewer responses | R |
+<details>
+<summary>Full tool list</summary>
+
+### Drive (24)
+`get-about`, `list-files`, `get-file`, `read-file`, `create-file`, `update-file`, `copy-file`, `delete-file`, `search-files`, `create-folder`, `move-file`, `get-folder-tree`, `list-permissions`, `share-file`, `remove-permission`, `export-file`, `get-download-link`, `list-comments`, `get-comment`, `create-comment`, `resolve-comment`, `list-revisions`, `get-revision`, `get-activity`
+
+### Google Docs (13)
+**Document**: `docs-get-document`, `docs-create-document`, `docs-get-content`, `docs-list-tabs`
+**Editing**: `docs-insert-text`, `docs-delete-range`, `docs-replace-text`, `docs-batch-update`
+**Formatting**: `docs-format-text`, `docs-format-paragraph`
+**Elements**: `docs-insert-table`, `docs-insert-image`, `docs-insert-page-break`
+
+### Google Sheets (30)
+**Data**: `sheets-get-spreadsheet`, `sheets-get-values`, `sheets-batch-get-values`, `sheets-update-values`, `sheets-batch-update-values`, `sheets-append-values`, `sheets-clear-values`, `sheets-batch-clear-values`, `sheets-create-spreadsheet`, `sheets-manage-sheets`
+**Structure**: `sheets-insert-dimension`, `sheets-delete-dimension`, `sheets-duplicate-sheet`, `sheets-copy-sheet-to`, `sheets-copy-paste`, `sheets-sort-range`, `sheets-find-replace`
+**Formatting**: `sheets-format-cells`, `sheets-update-borders`, `sheets-merge-cells`, `sheets-unmerge-cells`, `sheets-auto-resize`, `sheets-resize-dimensions`
+**Advanced**: `sheets-set-data-validation`, `sheets-add-conditional-format`, `sheets-add-chart`, `sheets-delete-chart`, `sheets-add-protected-range`, `sheets-delete-protected-range`, `sheets-manage-named-range`
+
+### Google Slides (20)
+**Presentation**: `slides-get-presentation`, `slides-create-presentation`, `slides-duplicate-presentation`
+**Slide management**: `slides-get-slide`, `slides-add-slide`, `slides-delete-slide`, `slides-move-slide`, `slides-duplicate-slide`
+**Content**: `slides-insert-text`, `slides-replace-text`, `slides-insert-text-box`, `slides-insert-image`, `slides-insert-table`, `slides-update-table-cell`, `slides-insert-shape`
+**Formatting**: `slides-format-text`, `slides-format-shape`, `slides-resize-element`, `slides-set-slide-background`, `slides-batch-update`
+
+### GWS-only (8)
+`list-shared-drives`, `get-shared-drive`, `create-shared-drive`, `list-file-labels`, `apply-label`, `remove-label`, `list-approvals`, `get-approval`
+
+### Aggregations
+`summarize-spreadsheet`, `summarize-doc`
+
+### Meta
+`search-tools` — query other tools by keyword; always enabled.
+
+</details>
 
 ## Architecture
 
 ```
-Claude / AI Client
-       │
-       ▼ (MCP Protocol over stdio)
-┌──────────────────────────────────────────────────┐
-│  google-drive MCP Server                         │
-│                                                  │
-│  ┌────────────┐  ┌──────────────────────────┐    │
-│  │ config.ts  │  │ capabilities.ts          │    │
-│  │ (env/auth) │  │ (personal vs GWS detect) │    │
-│  └─────┬──────┘  └────────────┬─────────────┘    │
-│        │                      │                  │
-│  ┌─────▼──────────────────────▼─────────────┐    │
-│  │              client.ts                   │    │
-│  │  (OAuth2 / Service Account + Delegation) │    │
-│  └─────────────────┬────────────────────────┘    │
-│                    │                             │
-│  ┌─────────────────▼─────────────────────────┐   │
-│  │               tools/                      │   │
-│  │  files · search · folders · permissions   │   │
-│  │  export · comments · revisions · about    │   │
-│  │  activity · docs · sheets · slides          │   │
-│  │  shared-drives · labels · approvals       │   │
-│  └───────────────────────────────────────────┘   │
-└──────────────────────┬───────────────────────────┘
-                       │
-                       ▼
-              Google Drive API v3
-              Google Docs API v1
-              Google Sheets API v4
-              Google Slides API v1
-              Drive Activity API v2
-              Drive Labels API v2
+Claude → MCP stdio → src/index.ts
+                      ├── config.ts (OAuth2 / SA / ADC)
+                      ├── capabilities.ts (Personal vs GWS detect)
+                      ├── client.ts (Google API auth)
+                      └── tools/{files,search,folders,permissions,export,comments,revisions,
+                                  about,activity,docs,sheets,slides,shared-drives,labels,approvals,
+                                  aggregations}.ts
+                                       ↓
+                              Drive API v3 / Docs API v1 / Sheets API v4 /
+                              Slides API v1 / Drive Activity API v2 / Drive Labels API v2
 ```
 
-## Authentication Setup
+Built on [`@us-all/mcp-toolkit`](https://github.com/us-all/mcp-toolkit):
+- `extractFields` — token-efficient response projections
+- `aggregate(fetchers, caveats)` — fan-out helper for `summarize-doc`
+- `createWrapToolHandler` — Google query-string `key=...` redaction + `WriteBlockedError` / `GWSFeatureError` passthrough + Google API error extraction
+- `search-tools` meta-tool
 
-### OAuth2 (Personal or GWS)
+`supportsAllDrives: true` is passed to every Drive API call so Shared Drives just work.
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a project and enable the **Google Drive API**, **Google Docs API**, **Google Sheets API**, and **Google Slides API**
-3. Create OAuth2 credentials (Desktop App type)
-4. Get a refresh token using the OAuth2 playground or your own flow
-5. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
+## Tech stack
 
-### Service Account (GWS with Domain-Wide Delegation)
+Node.js 18+ • TypeScript strict ESM • pnpm • `@modelcontextprotocol/sdk` • `googleapis` (Drive v3 / Docs v1 / Sheets v4 / Slides v1 / Activity v2 / Labels v2) • zod • dotenv • vitest.
 
-1. Create a Service Account in Google Cloud Console
-2. Download the JSON key file
-3. In Google Workspace Admin Console:
-   - Go to **Security > API Controls > Domain-wide Delegation**
-   - Add the service account's Client ID
-   - Grant the required OAuth scopes
-4. Set `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` and `GOOGLE_IMPERSONATE_USER`
+## Limitations
 
-## Write Safety
-
-All write operations (create, update, delete, share) are **disabled by default**. Set `GOOGLE_DRIVE_ALLOW_WRITE=true` to enable them. GWS-only tools will return a clear error message when used with a personal Google account.
-
-## Tech Stack
-
-- **Runtime**: Node.js 18+
-- **Language**: TypeScript (strict mode)
-- **MCP SDK**: `@modelcontextprotocol/sdk`
-- **Google API**: `googleapis` (Drive API v3, Docs API v1, Sheets API v4, Slides API v1, Drive Activity API v2, Drive Labels API v2)
-- **Validation**: Zod
-- **Package Manager**: pnpm
-- **Test**: Vitest
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+- **Approvals API** — `googleapis` SDK has no typed bindings; uses raw `fetch` with auth header extraction.
+- **`search-files`** — auto-wraps plain text in `fullText contains '...'`; pass Drive query syntax directly for advanced searches.
 
 ## License
 
-MIT
+[MIT](./LICENSE)
