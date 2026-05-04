@@ -1,6 +1,6 @@
 # Google Drive MCP Server
 
-[![@us-all standard](https://img.shields.io/badge/built%20to-%40us--all%20MCP%20standard-blue)](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md) [한국어](./README_KO.md)
+[![@us-all standard](https://img.shields.io/badge/built%20to-%40us--all%20MCP%20standard-blue)](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md)
 
 > Authored to the [@us-all MCP Standard](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md) — token-efficient by design.
 
