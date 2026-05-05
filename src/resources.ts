@@ -1,7 +1,13 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getDriveClient, getSheetsClient, getDocsClient, getSlidesClient } from "./client.js";
 import { getCapabilities } from "./capabilities.js";
 import { requireGWS } from "./tools/utils.js";
+
+const UI_DIR = join(dirname(fileURLToPath(import.meta.url)), "ui");
+const AUDIT_SHARED_DRIVE_HTML = readFileSync(join(UI_DIR, "audit-shared-drive-permissions.html"), "utf-8");
 
 /**
  * MCP Resources for hot Google Drive entities.
@@ -182,5 +188,29 @@ export function registerResources(server: McpServer): void {
           : null,
       });
     },
+  );
+
+  // --- Apps SDK UI templates (ui:// scheme) ---
+  // Rendered by ChatGPT / Apps SDK clients via _meta["openai/outputTemplate"].
+  // Claude clients ignore the metadata and use the tool's text content instead.
+  server.registerResource(
+    "audit-shared-drive-permissions-card",
+    "ui://widget/audit-shared-drive-permissions.html",
+    {
+      title: "Shared Drive Permission Audit card",
+      description: "Apps SDK UI template rendered with audit-shared-drive-permissions tool output",
+      mimeType: "text/html+skybridge",
+      _meta: {
+        "openai/outputTemplate": "ui://widget/audit-shared-drive-permissions.html",
+        "ui.resourceUri": "ui://widget/audit-shared-drive-permissions.html",
+      },
+    },
+    async (uri) => ({
+      contents: [{
+        uri: uri.toString(),
+        mimeType: "text/html+skybridge",
+        text: AUDIT_SHARED_DRIVE_HTML,
+      }],
+    }),
   );
 }

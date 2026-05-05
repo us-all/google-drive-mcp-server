@@ -151,6 +151,9 @@ import {
   getSharedDriveSchema, getSharedDrive,
   createSharedDriveSchema, createSharedDrive,
 } from "./tools/shared-drives.js";
+import {
+  auditSharedDrivePermissionsSchema, auditSharedDrivePermissions,
+} from "./tools/audit-shared-drive-permissions.js";
 
 // GWS-only: Labels
 import {
@@ -846,6 +849,32 @@ tool(
   "[GWS] Create a new Shared Drive. Requires Google Workspace Business Standard or higher. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   createSharedDriveSchema.shape,
   wrapToolHandler(createSharedDrive),
+);
+
+// Card-aware wrapper: see datadog `slo-compliance-snapshot` for the same pattern.
+const AUDIT_SHARED_DRIVE_CARD_URI = "ui://widget/audit-shared-drive-permissions.html";
+const wrappedAuditSharedDrive = wrapToolHandler(auditSharedDrivePermissions);
+async function auditSharedDrivePermissionsWithCard(args: Parameters<typeof wrappedAuditSharedDrive>[0]) {
+  const result = await wrappedAuditSharedDrive(args);
+  if (result.isError) return result;
+  try {
+    const structured = JSON.parse(result.content[0].text);
+    return {
+      ...result,
+      structuredContent: structured,
+      _meta: {
+        "openai/outputTemplate": AUDIT_SHARED_DRIVE_CARD_URI,
+        "ui.resourceUri": AUDIT_SHARED_DRIVE_CARD_URI,
+      },
+    };
+  } catch { return result; }
+}
+
+tool(
+  "audit-shared-drive-permissions",
+  "[GWS] Sampling-based permission audit for a Shared Drive. Walks up to maxFiles (default 100, newest first), tallies anyone-with-link grants, external-domain shares, high-share files (>= highShareThreshold permissions), permission classes, and roles. Auto-detects internal domain from the GWS account when not specified. Returns flagged file lists for each finding category. Renders an Apps SDK card on ChatGPT clients.",
+  auditSharedDrivePermissionsSchema.shape,
+  auditSharedDrivePermissionsWithCard,
 );
 
 // Labels

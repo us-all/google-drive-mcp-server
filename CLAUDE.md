@@ -73,6 +73,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 
 ## 최근 변경사항 (2026-04-20)
 
+- **v1.13.0** (2026-05-05): 신규 `audit-shared-drive-permissions` 도구 + Apps SDK UI 카드 — Shared Drive 권한 감사 (sampling-based). 최신순 N파일 walk(default 100, max 500), anyone-with-link/external-domain/high-share 자동 식별, 내부 도메인은 GWS 계정에서 auto-detect. 결과: filesAudited, uniqueGrantees, externalGrantees, anyoneWithLinkFiles, externalFiles, highShareFiles + 각 카테고리별 flagged file 리스트. ChatGPT 클라이언트에서 카드로 렌더 (3개 risk stat headline + permission classes + roles + 3개 finding 섹션). Claude 클라이언트는 JSON 응답 그대로. 빌드 시 `src/ui/*.html`을 `dist/ui/`로 자동 복사.
 - **v1.12.0** (2026-05-05): `startMcpServer` 채택 — toolkit v1.2.0의 런타임 헬퍼로 stdio transport 부트스트랩을 1줄로 교체 (capability detection은 main()에 그대로 보존). `MCP_TRANSPORT=http`로 Streamable HTTP transport 옵트인 가능 (기본 stdio). Bearer 인증, `/health` 엔드포인트. 기존 stdio 사용자 영향 0.
 - **v1.11.5** (2026-05-05): `@us-all/mcp-toolkit ^1.2.0` 핀 업데이트 — 자동 cascade. 코드 변경 0줄.
 - **v1.3.0**: Google Docs API v1 지원 추가 — 13개 도구 (문서 관리, 콘텐츠 편집, 서식, 테이블/이미지/페이지 브레이크 삽입, 멀티탭 지원)
