@@ -73,6 +73,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 
 ## 최근 변경사항 (2026-04-20)
 
+- **v1.11.5** (2026-05-05): `@us-all/mcp-toolkit ^1.2.0` 핀 업데이트 — 자동 cascade. 코드 변경 0줄.
 - **v1.3.0**: Google Docs API v1 지원 추가 — 13개 도구 (문서 관리, 콘텐츠 편집, 서식, 테이블/이미지/페이지 브레이크 삽입, 멀티탭 지원)
 - **v1.2.0**: Google Slides API v1 지원 추가 — 20개 도구 (프레젠테이션 관리, 슬라이드 편집, 콘텐츠 삽입, 서식)
 - **v1.1.1**: Windows ADC 경로 지원 — `%APPDATA%\gcloud\` 경로 인식 추가 (기존 Unix 경로만 지원)
