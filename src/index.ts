@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { startMcpServer } from "@us-all/mcp-toolkit/runtime";
 import { validateConfig } from "./config.js";
 import { detectCapabilities } from "./capabilities.js";
 import { wrapToolHandler } from "./tools/utils.js";
@@ -944,9 +944,7 @@ async function main() {
     );
   }
 
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Google Drive MCP server running on stdio");
+  await startMcpServer(server);
 }
 
 main().catch((error) => {
