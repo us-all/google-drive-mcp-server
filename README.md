@@ -6,7 +6,7 @@
 
 [![npm](https://img.shields.io/npm/v/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
 [![downloads](https://img.shields.io/npm/dm/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
-[![tools](https://img.shields.io/badge/tools-96-blue)](#tools)
+[![tools](https://img.shields.io/badge/tools-97-blue)](#tools)
 [![@us-all standard](https://img.shields.io/badge/built%20to-%40us--all%20MCP%20standard-blue)](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md)
 
 ## What it does that others don't
@@ -15,8 +15,8 @@
 - **Full Slides editing** — presentations, slides, shapes, tables, images, formatting. Not in the connector at all.
 - **Shared-Drive admin tooling** — `list-shared-drives`, `get-shared-drive`, `create-shared-drive`, list/share/remove permissions, file activity, labels, approvals. Workspace governance surface the connector deliberately doesn't expose.
 - **3 auth modes** — OAuth2 (personal or GWS), Service Account + Domain-Wide Delegation (org-scale), Application Default Credentials (auto-detected).
-- **Aggregation tools** — `summarize-spreadsheet` (metadata + per-tab sample + named ranges in one call), `summarize-doc` (file + content + permissions + comments).
-- **MCP Prompts** (4) — `audit-shared-drive-permissions`, `cleanup-shared-with-me`, `analyze-doc-structure`, `bulk-format-spreadsheet`.
+- **Aggregation tools** — `audit-shared-drive-permissions` (sampling-based audit: anyone-with-link / external-domain / high-share findings in one call), `summarize-spreadsheet` (metadata + per-tab sample + named ranges), `summarize-doc` (file + content + permissions + comments).
+- **MCP Prompts** (3) — `cleanup-shared-with-me`, `analyze-doc-structure`, `bulk-format-spreadsheet`.
 - **GWS-aware** — `capabilities.ts` detects account type on startup; GWS-only tools return clear errors for personal accounts instead of mysterious 403s.
 
 ## Try this — 5 prompts
@@ -123,8 +123,15 @@ node dist/index.js
 | `GOOGLE_DRIVE_SCOPES` | ❌ | `drive.readonly` (or `drive` if write enabled) | Comma-sep OAuth scopes override |
 | `GD_TOOLS` | ❌ | — | Comma-sep allowlist of categories. Biggest token saver. |
 | `GD_DISABLE` | ❌ | — | Comma-sep denylist. Ignored when `GD_TOOLS` is set. |
+| `MCP_TRANSPORT` | ❌ | `stdio` | `http` to enable Streamable HTTP transport |
+| `MCP_HTTP_TOKEN` | conditional | — | Bearer token. Required when `MCP_TRANSPORT=http` |
+| `MCP_HTTP_PORT` | ❌ | `3000` | HTTP listen port |
+| `MCP_HTTP_HOST` | ❌ | `127.0.0.1` | HTTP bind host (DNS rebinding protection auto-enabled for localhost) |
+| `MCP_HTTP_SKIP_AUTH` | ❌ | `false` | Skip Bearer auth — e.g. behind a reverse proxy that handles it |
 
 **Categories** (7): `drive`, `sheets`, `docs`, `slides`, `shared-drives`, `labels`, `approvals`. Plus always-on `meta`.
+
+When `MCP_TRANSPORT=http`: `POST /mcp` (Bearer-auth JSON-RPC) + `GET /health` (public liveness).
 
 ### Token efficiency
 
@@ -174,7 +181,7 @@ URI-based read-only access:
 - `gdrive://shared-drive/{driveId}` (GWS-gated)
 - `gdrive://about/me`
 
-## Tools (96)
+## Tools (97)
 
 7 categories. Use `search-tools` to discover at runtime; full list collapsed below.
 
@@ -184,7 +191,7 @@ URI-based read-only access:
 | Drive (files / search / folders / permissions / export / comments / revisions / activity) | 24 |
 | Slides (presentation / slide mgmt / content / formatting) | 20 |
 | Docs (document / editing / formatting / elements) | 13 |
-| GWS-only (shared drives / labels / approvals) | 8 |
+| GWS-only (shared drives / labels / approvals / audit) | 9 |
 | Aggregations (`summarize-spreadsheet`, `summarize-doc`) | 2 |
 | Meta (`search-tools`) | 1 |
 
@@ -212,8 +219,8 @@ URI-based read-only access:
 **Content**: `slides-insert-text`, `slides-replace-text`, `slides-insert-text-box`, `slides-insert-image`, `slides-insert-table`, `slides-update-table-cell`, `slides-insert-shape`
 **Formatting**: `slides-format-text`, `slides-format-shape`, `slides-resize-element`, `slides-set-slide-background`, `slides-batch-update`
 
-### GWS-only (8)
-`list-shared-drives`, `get-shared-drive`, `create-shared-drive`, `list-file-labels`, `apply-label`, `remove-label`, `list-approvals`, `get-approval`
+### GWS-only (9)
+`list-shared-drives`, `get-shared-drive`, `create-shared-drive`, `audit-shared-drive-permissions`, `list-file-labels`, `apply-label`, `remove-label`, `list-approvals`, `get-approval`
 
 ### Aggregations
 `summarize-spreadsheet`, `summarize-doc`
