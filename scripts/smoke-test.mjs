@@ -21,7 +21,7 @@ const PROJECT_ROOT = resolve(__dirname, "..");
 const SERVER_BIN = resolve(PROJECT_ROOT, "dist/index.js");
 
 const TIMEOUT_MS = 30_000;
-const EXPECTED_TOOL_COUNT = 96;
+const EXPECTED_TOOL_COUNT = 97;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
