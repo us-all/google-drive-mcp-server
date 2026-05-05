@@ -1,6 +1,6 @@
 {
   "name": "@us-all/google-drive-mcp",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
   "type": "module",
   "main": "dist/index.js",
@@ -42,7 +42,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"require('fs').cpSync('src/ui','dist/ui',{recursive:true})\"",
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "test": "vitest run",

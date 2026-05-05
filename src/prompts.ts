@@ -6,55 +6,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 // already-registered Google Drive tools.
 
 export function registerPrompts(server: McpServer): void {
-  server.registerPrompt(
-    "audit-shared-drive-permissions",
-    {
-      title: "Audit Shared Drive permissions",
-      description:
-        "Scan a Shared Drive (or My Drive) and produce a risk-ranked report of files with risky external sharing.",
-      argsSchema: {
-        driveId: z
-          .string()
-          .describe("Shared Drive ID, or 'my-drive' to scan the user's My Drive"),
-        riskThreshold: z
-          .string()
-          .optional()
-          .describe(
-            "Lowest scope to flag: 'anyoneWithLink' (default), 'domain', or 'external'",
-          ),
-      },
-    },
-    ({ driveId, riskThreshold }) => {
-      const threshold = riskThreshold ?? "anyoneWithLink";
-      const isMyDrive = driveId === "my-drive";
-      return {
-        messages: [
-          {
-            role: "user",
-            content: {
-              type: "text",
-              text: [
-                `Audit sharing permissions in ${isMyDrive ? "My Drive" : `Shared Drive ${driveId}`} and flag entries at or above risk threshold '${threshold}'.`,
-                "",
-                "Note: Shared Drive scans require a Google Workspace account. If `get-about` reports a personal account, fall back to a My Drive scan.",
-                "",
-                "Steps:",
-                `1. Call \`get-about\` to confirm the account type and capture the user's domain (needed to detect external sharing).`,
-                isMyDrive
-                  ? `2. Call \`search-files\` with corpora='user', extractFields='files.*.id,files.*.name,files.*.mimeType,files.*.owners,files.*.permissions,files.*.webViewLink' to enumerate files the user can see.`
-                  : `2. Call \`list-files\` (or \`search-files\` with corpora='drive', driveId=${JSON.stringify(driveId)}) requesting permissions field. Page through all results.`,
-                "3. For each file lacking inline permissions, call `list-permissions` (fileId={id}) to fetch them.",
-                `4. Flag any permission where role is 'writer', 'fileOrganizer', 'organizer', or 'owner' AND scope is external — i.e. type='anyone' (link sharing), or type='domain' with a domain != owner's domain, or type='user'/'group' whose email domain != owner's domain.`,
-                `5. Apply the threshold '${threshold}': 'anyoneWithLink' includes type='anyone'; 'domain' adds cross-domain shares; 'external' = both.`,
-                "6. Rank results by risk (writer+anyone > writer+external-domain > commenter+anyone, etc.). Produce a markdown table: file name, link, owner, risky permission (type/scope/role/email), suggested remediation (e.g. `remove-permission` call signature).",
-                "7. End with totals: files scanned, files flagged, breakdown by risk level. Do NOT call `remove-permission` — leave remediation to the user.",
-              ].join("\n"),
-            },
-          },
-        ],
-      };
-    },
-  );
+  // The `audit-shared-drive-permissions` Prompt was removed in v1.13.0.
+  // The new `audit-shared-drive-permissions` Tool delivers the same audit
+  // (anyone-with-link / external / high-share findings) in a single call
+  // instead of the multi-step orchestration this Prompt used to instruct.
 
   server.registerPrompt(
     "cleanup-shared-with-me",
