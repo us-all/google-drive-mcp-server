@@ -6,7 +6,7 @@
 
 [![npm](https://img.shields.io/npm/v/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
 [![downloads](https://img.shields.io/npm/dm/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
-[![tools](https://img.shields.io/badge/tools-97-blue)](#tools)
+[![tools](https://img.shields.io/badge/tools-98-blue)](#tools)
 [![@us-all standard](https://img.shields.io/badge/built%20to-%40us--all%20MCP%20standard-blue)](https://github.com/us-all/mcp-toolkit/blob/main/STANDARD.md)
 
 ## What it does that others don't
@@ -15,7 +15,7 @@
 - **Full Slides editing** — presentations, slides, shapes, tables, images, formatting. Not in the connector at all.
 - **Shared-Drive admin tooling** — `list-shared-drives`, `get-shared-drive`, `create-shared-drive`, list/share/remove permissions, file activity, labels, approvals. Workspace governance surface the connector deliberately doesn't expose.
 - **3 auth modes** — OAuth2 (personal or GWS), Service Account + Domain-Wide Delegation (org-scale), Application Default Credentials (auto-detected).
-- **Aggregation tools** — `audit-shared-drive-permissions` (sampling-based audit: anyone-with-link / external-domain / high-share findings in one call), `summarize-spreadsheet` (metadata + per-tab sample + named ranges), `summarize-doc` (file + content + permissions + comments).
+- **Aggregation tools** — `audit-shared-drive-permissions` (single Shared-Drive audit) + `audit-external-shares` (cross-drive / My-Drive audit with top external-domain concentration view), `summarize-spreadsheet` (metadata + per-tab sample + named ranges), `summarize-doc` (file + content + permissions + comments).
 - **MCP Prompts** (3) — `cleanup-shared-with-me`, `analyze-doc-structure`, `bulk-format-spreadsheet`.
 - **GWS-aware** — `capabilities.ts` detects account type on startup; GWS-only tools return clear errors for personal accounts instead of mysterious 403s.
 
@@ -39,7 +39,7 @@ Connect the server to Claude Desktop or Claude Code, then paste any of these:
 | Slides editing | ❌ | ✅ | ❌ | ✅ deep |
 | Shared-drive admin | partial | ✅ | ❌ | ✅ deep |
 | Folder operations | ❌ | ✅ | ❌ | ✅ |
-| Aggregation tools | ❌ | ❌ | ❌ | ✅ `summarize-spreadsheet`, `summarize-doc` |
+| Aggregation tools | ❌ | ❌ | ❌ | ✅ `summarize-spreadsheet`, `summarize-doc`, `audit-external-shares` |
 | MCP Prompts | ❌ | ❌ | ❌ | ✅ 4 |
 | Auth modes | managed OAuth | OAuth + SA + stateless | SA / OAuth / ADC | OAuth + SA + DWD + ADC |
 | Transport | n/a (Claude.ai-only) | stdio + HTTP | stdio | stdio |
@@ -181,7 +181,7 @@ URI-based read-only access:
 - `gdrive://shared-drive/{driveId}` (GWS-gated)
 - `gdrive://about/me`
 
-## Tools (97)
+## Tools (98)
 
 7 categories. Use `search-tools` to discover at runtime; full list collapsed below.
 
@@ -192,7 +192,7 @@ URI-based read-only access:
 | Slides (presentation / slide mgmt / content / formatting) | 20 |
 | Docs (document / editing / formatting / elements) | 13 |
 | GWS-only (shared drives / labels / approvals / audit) | 9 |
-| Aggregations (`summarize-spreadsheet`, `summarize-doc`) | 2 |
+| Aggregations (`summarize-spreadsheet`, `summarize-doc`, `audit-external-shares`) | 3 |
 | Meta (`search-tools`) | 1 |
 
 <details>
@@ -223,7 +223,9 @@ URI-based read-only access:
 `list-shared-drives`, `get-shared-drive`, `create-shared-drive`, `audit-shared-drive-permissions`, `list-file-labels`, `apply-label`, `remove-label`, `list-approvals`, `get-approval`
 
 ### Aggregations
-`summarize-spreadsheet`, `summarize-doc`
+`summarize-spreadsheet`, `summarize-doc`, `audit-external-shares`
+
+`audit-external-shares` complements the GWS-only `audit-shared-drive-permissions`: it runs across all corpora the caller can see (or just My Drive on personal accounts) and adds a top-external-domains concentration view.
 
 ### Meta
 `search-tools` — query other tools by keyword; always enabled.

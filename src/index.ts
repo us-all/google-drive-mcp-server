@@ -154,6 +154,9 @@ import {
 import {
   auditSharedDrivePermissionsSchema, auditSharedDrivePermissions,
 } from "./tools/audit-shared-drive-permissions.js";
+import {
+  auditExternalSharesSchema, auditExternalShares,
+} from "./tools/audit-external-shares.js";
 
 // GWS-only: Labels
 import {
@@ -875,6 +878,13 @@ tool(
   "[GWS] Sampling-based permission audit for a Shared Drive. Walks up to maxFiles (default 100, newest first), tallies anyone-with-link grants, external-domain shares, high-share files (>= highShareThreshold permissions), permission classes, and roles. Auto-detects internal domain from the GWS account when not specified. Returns flagged file lists for each finding category. Renders an Apps SDK card on ChatGPT clients.",
   auditSharedDrivePermissionsSchema.shape,
   auditSharedDrivePermissionsWithCard,
+);
+
+tool(
+  "audit-external-shares",
+  "Cross-drive external-share audit (corpora='user' for My Drive only — works on personal accounts; 'allDrives' for everything visible — GWS only). Same finding categories as audit-shared-drive-permissions (anyone-with-link, external, high-share) but scoped across all drives the caller can see, plus a topExternalDomains breakdown for concentration risk. Walks up to maxFiles (default 200, max 1000) newest-first.",
+  auditExternalSharesSchema.shape,
+  wrapToolHandler(auditExternalShares),
 );
 
 // Labels
