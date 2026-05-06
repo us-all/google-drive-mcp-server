@@ -40,7 +40,8 @@ const VALID_SA = JSON.stringify({
   type: "service_account",
   project_id: "us-all-prod",
   private_key_id: "abc",
-  private_key: "-----BEGIN PRIVATE KEY-----\nfoo\n-----END PRIVATE KEY-----\n",
+  // Validator only checks for non-empty; avoid a real PEM block to keep gitleaks quiet.
+  private_key: "test-private-key-placeholder",
   client_email: "drive-mcp@us-all-prod.iam.gserviceaccount.com",
   client_id: "12345",
 });
