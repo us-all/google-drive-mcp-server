@@ -1,0 +1,66 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.us-all/google-drive",
+  "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
+  "repository": {
+    "url": "https://github.com/us-all/google-drive-mcp-server",
+    "source": "github"
+  },
+  "version": "1.14.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@us-all/google-drive-mcp",
+      "version": "1.14.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "GOOGLE_CLIENT_ID",
+          "description": "OAuth client ID. Required for OAuth refresh-token auth method.",
+          "isSecret": true
+        },
+        {
+          "name": "GOOGLE_CLIENT_SECRET",
+          "description": "OAuth client secret. Required for OAuth refresh-token auth method.",
+          "isSecret": true
+        },
+        {
+          "name": "GOOGLE_REFRESH_TOKEN",
+          "description": "OAuth refresh token. Required for OAuth refresh-token auth method.",
+          "isSecret": true
+        },
+        {
+          "name": "GOOGLE_APPLICATION_CREDENTIALS",
+          "description": "Path to service account JSON key. Required for SA + DWD auth method (alternative to OAuth)."
+        },
+        {
+          "name": "GOOGLE_SERVICE_ACCOUNT_KEY_PATH",
+          "description": "Alias for GOOGLE_APPLICATION_CREDENTIALS."
+        },
+        {
+          "name": "GOOGLE_IMPERSONATE_USER",
+          "description": "Workspace user email to impersonate (DWD). Required when using service account auth."
+        },
+        {
+          "name": "GOOGLE_DRIVE_SCOPES",
+          "description": "Comma-separated OAuth scopes. Default scopes cover Drive + Docs + Sheets + Slides read/write."
+        },
+        {
+          "name": "GOOGLE_DRIVE_ALLOW_WRITE",
+          "description": "Set to 'true' to enable write tools. Default read-only.",
+          "default": "false"
+        },
+        {
+          "name": "GD_TOOLS",
+          "description": "Comma-separated category allowlist. Default: all categories enabled."
+        },
+        {
+          "name": "GD_DISABLE",
+          "description": "Comma-separated category disablelist."
+        }
+      ]
+    }
+  ]
+}
