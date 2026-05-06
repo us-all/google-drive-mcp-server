@@ -2,6 +2,11 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { resolveServiceAccountPath, validateServiceAccountKey } from "./sa-validation.js";
+
+// Re-export for back-compat with anything that imported these from config.ts
+export { resolveServiceAccountPath, validateServiceAccountKey } from "./sa-validation.js";
+export type { SaKeyValidation } from "./sa-validation.js";
 
 dotenv.config();
 
@@ -111,7 +116,7 @@ function loadAdcCredentials(): AdcCredentials | null {
 }
 
 function detectAuthMethod(): AuthMethod {
-  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH) {
+  if (resolveServiceAccountPath(process.env)) {
     return "service-account";
   }
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
@@ -131,7 +136,7 @@ export const config: Config = {
   clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
   refreshToken: process.env.GOOGLE_REFRESH_TOKEN ?? "",
 
-  serviceAccountKeyPath: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH ?? "",
+  serviceAccountKeyPath: resolveServiceAccountPath(process.env),
   impersonateUser: process.env.GOOGLE_IMPERSONATE_USER ?? "",
 
   adcCredentials: loadAdcCredentials(),
@@ -145,14 +150,33 @@ export const config: Config = {
 // Scopes depend on allowWrite, so parse after config is created
 config.scopes = parseScopes();
 
-export function validateConfig(): void {
+export function validateConfig(
+  logger: (msg: string) => void = (m) => console.error(m),
+): void {
   if (config.authMethod === "oauth2") {
     if (!config.clientId) throw new Error("GOOGLE_CLIENT_ID is required for OAuth2 authentication");
     if (!config.clientSecret) throw new Error("GOOGLE_CLIENT_SECRET is required for OAuth2 authentication");
     if (!config.refreshToken) throw new Error("GOOGLE_REFRESH_TOKEN is required for OAuth2 authentication");
   } else if (config.authMethod === "service-account") {
     if (!config.serviceAccountKeyPath) {
-      throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY_PATH is required for Service Account authentication");
+      throw new Error(
+        "Service Account auth selected but no key path resolved. Set GOOGLE_SERVICE_ACCOUNT_KEY_PATH " +
+          "(or GOOGLE_APPLICATION_CREDENTIALS to a service account JSON file).",
+      );
+    }
+    const validation = validateServiceAccountKey(config.serviceAccountKeyPath);
+    if (!validation.ok) {
+      throw new Error(
+        `Service account key invalid (${config.serviceAccountKeyPath}): ${validation.error}`,
+      );
+    }
+    if (!config.impersonateUser) {
+      logger(
+        `[google-drive-mcp] Service Account auth without GOOGLE_IMPERSONATE_USER. ` +
+          `Without DWD impersonation, the SA (${validation.clientEmail}) can only access resources it owns directly — ` +
+          `typically nothing for a fresh SA. To access Workspace user data, configure DWD ` +
+          `(https://support.google.com/a/answer/162106) and set GOOGLE_IMPERSONATE_USER=user@yourdomain.com.`,
+      );
     }
   } else if (config.authMethod === "adc") {
     if (!config.adcCredentials) {

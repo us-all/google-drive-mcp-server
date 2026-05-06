@@ -6,12 +6,12 @@
     "url": "https://github.com/us-all/google-drive-mcp-server",
     "source": "github"
   },
-  "version": "1.14.1",
+  "version": "1.15.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@us-all/google-drive-mcp",
-      "version": "1.14.1",
+      "version": "1.15.0",
       "transport": {
         "type": "stdio"
       },

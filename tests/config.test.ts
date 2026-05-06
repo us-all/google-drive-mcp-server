@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
+import { validateServiceAccountKey, resolveServiceAccountPath } from "../src/sa-validation.js";
 
 describe("config", () => {
   beforeEach(() => {
@@ -21,5 +22,103 @@ describe("config", () => {
   it("has write disabled by default", async () => {
     const { config } = await import("../src/config.js");
     expect(config.allowWrite).toBe(false);
+  });
+});
+
+function makeFs(files: Record<string, string | "missing">) {
+  return {
+    existsSync: (p: string) => files[p] !== undefined && files[p] !== "missing",
+    readFileSync: (p: string, _enc: BufferEncoding) => {
+      const v = files[p];
+      if (v === undefined || v === "missing") throw new Error(`ENOENT: ${p}`);
+      return v;
+    },
+  };
+}
+
+const VALID_SA = JSON.stringify({
+  type: "service_account",
+  project_id: "us-all-prod",
+  private_key_id: "abc",
+  // Validator only checks for non-empty; avoid a real PEM block to keep gitleaks quiet.
+  private_key: "test-private-key-placeholder",
+  client_email: "drive-mcp@us-all-prod.iam.gserviceaccount.com",
+  client_id: "12345",
+});
+
+describe("validateServiceAccountKey", () => {
+  it("accepts a valid SA key file", () => {
+    const fsImpl = makeFs({ "/sa.json": VALID_SA });
+    const result = validateServiceAccountKey("/sa.json", fsImpl);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.clientEmail).toBe("drive-mcp@us-all-prod.iam.gserviceaccount.com");
+      expect(result.projectId).toBe("us-all-prod");
+    }
+  });
+
+  it("rejects empty path", () => {
+    const result = validateServiceAccountKey("", makeFs({}));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/empty/);
+  });
+
+  it("rejects missing file", () => {
+    const result = validateServiceAccountKey("/missing.json", makeFs({ "/missing.json": "missing" }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/not found/);
+  });
+
+  it("rejects invalid JSON", () => {
+    const result = validateServiceAccountKey("/bad.json", makeFs({ "/bad.json": "{not json" }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/invalid JSON/);
+  });
+
+  it("rejects wrong type (e.g. authorized_user instead of service_account)", () => {
+    const fsImpl = makeFs({
+      "/oauth.json": JSON.stringify({ type: "authorized_user", client_id: "x", refresh_token: "y" }),
+    });
+    const result = validateServiceAccountKey("/oauth.json", fsImpl);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/wrong type.*service_account.*authorized_user/);
+  });
+
+  it("rejects SA missing required fields", () => {
+    const fsImpl = makeFs({
+      "/incomplete.json": JSON.stringify({ type: "service_account", project_id: "p" }),
+    });
+    const result = validateServiceAccountKey("/incomplete.json", fsImpl);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/missing required field: client_email/);
+  });
+});
+
+describe("resolveServiceAccountPath", () => {
+  it("prefers GOOGLE_SERVICE_ACCOUNT_KEY_PATH when set", () => {
+    const fsImpl = makeFs({ "/explicit.json": VALID_SA, "/gac.json": VALID_SA });
+    const path = resolveServiceAccountPath(
+      { GOOGLE_SERVICE_ACCOUNT_KEY_PATH: "/explicit.json", GOOGLE_APPLICATION_CREDENTIALS: "/gac.json" },
+      fsImpl,
+    );
+    expect(path).toBe("/explicit.json");
+  });
+
+  it("falls back to GOOGLE_APPLICATION_CREDENTIALS when it points to a valid SA file", () => {
+    const fsImpl = makeFs({ "/gac.json": VALID_SA });
+    const path = resolveServiceAccountPath({ GOOGLE_APPLICATION_CREDENTIALS: "/gac.json" }, fsImpl);
+    expect(path).toBe("/gac.json");
+  });
+
+  it("does NOT pick up GOOGLE_APPLICATION_CREDENTIALS when it points to an authorized_user (ADC) file", () => {
+    const fsImpl = makeFs({
+      "/adc.json": JSON.stringify({ type: "authorized_user", client_id: "x", refresh_token: "y", client_secret: "z" }),
+    });
+    const path = resolveServiceAccountPath({ GOOGLE_APPLICATION_CREDENTIALS: "/adc.json" }, fsImpl);
+    expect(path).toBe("");
+  });
+
+  it("returns empty string when neither env var is set", () => {
+    expect(resolveServiceAccountPath({}, makeFs({}))).toBe("");
   });
 });
