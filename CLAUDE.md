@@ -73,6 +73,7 @@ Always pass `supportsAllDrives: true` to Drive API calls.
 
 ## 최근 변경사항 (2026-04-20)
 
+- **v1.15.0** (2026-05-06): SA + DWD 인증 경로 보강 — (1) `GOOGLE_APPLICATION_CREDENTIALS`를 service-account 키 경로 alias로 인식 (industry-standard env var). 단, 파일이 `type: "service_account"` JSON일 때만 SA 모드로, `authorized_user`(gcloud ADC)이면 무시 → ADC fallback 그대로 작동. (2) 부팅 시 SA 키 파일 검증 — 존재 + JSON 파싱 + `type=service_account` + 필수 필드(`client_email`, `private_key`, `project_id`) 검사. 깨진 키는 first-call 시점이 아니라 startup에서 즉시 명확한 에러로 거부. (3) SA 모드인데 `GOOGLE_IMPERSONATE_USER` 미설정 시 stderr 경고 — DWD 미설정 SA는 본인 소유 리소스만 액세스 가능(통상 빈 결과)이라 사용자가 침묵 실패 전에 알 수 있도록. 순수 검증 함수는 `src/sa-validation.ts`로 분리(테스트 격리). 10 신규 vitest 케이스(84/84 통과). 외부 인터페이스 변경 0(기존 `GOOGLE_SERVICE_ACCOUNT_KEY_PATH`도 그대로).
 - **v1.14.1** (2026-05-06): MCP Server Registry 발행 — `mcpName: "io.github.us-all/google-drive"` 추가 + 루트 `server.json` (OAuth + Service Account/DWD 두 인증 경로 모두 환경변수 메타데이터에 노출). 코드 변경 0줄.
 - **v1.14.0** (2026-05-05): 신규 `audit-external-shares` 도구 — cross-drive / My-Drive 권한 감사. `audit-shared-drive-permissions`는 단일 Shared Drive 한정이지만 본 도구는 corpora `user`(My Drive only — personal 계정 호환) 또는 `allDrives`(GWS) 범위로 newest-first walk(default 200, max 1000), 동일 분류 로직(anyone/external/high-share) + 추가로 `topExternalDomains`(외부 도메인별 노출 파일 수, 집중 위험 식별). personal 계정은 internalDomain 명시 안 하면 모든 email grantee를 external로 분류 → caveats로 surface. 도구 96→97, smoke EXPECTED_TOOL_COUNT 96→97.
 - **v1.13.1** (2026-05-05): `@us-all/mcp-toolkit ^1.2.1` 핀 업데이트 — 자동 cascade. 코드 변경 0줄.
