@@ -6,12 +6,12 @@
     "url": "https://github.com/us-all/google-drive-mcp-server",
     "source": "github"
   },
-  "version": "1.15.0",
+  "version": "1.15.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@us-all/google-drive-mcp",
-      "version": "1.15.0",
+      "version": "1.15.1",
       "transport": {
         "type": "stdio"
       },
@@ -45,7 +45,7 @@
         },
         {
           "name": "GOOGLE_DRIVE_SCOPES",
-          "description": "Comma-separated OAuth scopes. Default scopes cover Drive + Docs + Sheets + Slides read/write."
+          "description": "Comma-separated OAuth scopes. Defaults are read-only; write mode broadens Drive/Docs scopes as needed."
         },
         {
           "name": "GOOGLE_DRIVE_ALLOW_WRITE",

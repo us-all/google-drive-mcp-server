@@ -2,7 +2,7 @@
 
 > **The Workspace power-editing MCP — formula-aware Sheets, full Slides editing, shared-drive audits the read-only Claude.ai connector deliberately won't ship.**
 >
-> 96 tools across Drive (24) + Docs (13) + Sheets (30) + Slides (20) + GWS admin (8) + aggregations (2). Service Account + Domain-Wide Delegation for org-scale automation. GWS-aware capability detection — features auto-unlock for Workspace accounts.
+> 98 tools across Drive, Docs, Sheets, Slides, GWS admin, and aggregations. Service Account + Domain-Wide Delegation for org-scale automation. GWS-aware capability detection — features auto-unlock for Workspace accounts.
 
 [![npm](https://img.shields.io/npm/v/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
 [![downloads](https://img.shields.io/npm/dm/@us-all/google-drive-mcp)](https://www.npmjs.com/package/@us-all/google-drive-mcp)
@@ -60,8 +60,7 @@ Connect the server to Claude Desktop or Claude Code, then paste any of these:
       "env": {
         "GOOGLE_CLIENT_ID": "<your-client-id>",
         "GOOGLE_CLIENT_SECRET": "<your-client-secret>",
-        "GOOGLE_REFRESH_TOKEN": "<your-refresh-token>",
-        "GOOGLE_DRIVE_ALLOW_WRITE": "true"
+        "GOOGLE_REFRESH_TOKEN": "<your-refresh-token>"
       }
     }
   }
@@ -121,7 +120,7 @@ node dist/index.js
 | `GOOGLE_SERVICE_ACCOUNT_KEY_PATH` | SA | — | Path to service-account JSON key |
 | `GOOGLE_IMPERSONATE_USER` | ❌ | — | GWS user email to impersonate (SA only) |
 | `GOOGLE_DRIVE_ALLOW_WRITE` | ❌ | `false` | Set `true` to enable mutations |
-| `GOOGLE_DRIVE_SCOPES` | ❌ | `drive.readonly` (or `drive` if write enabled) | Comma-sep OAuth scopes override |
+| `GOOGLE_DRIVE_SCOPES` | ❌ | read-only Drive Activity + Docs scopes (or broader Drive/Docs scopes if write enabled) | Comma-sep OAuth scopes override |
 | `GD_TOOLS` | ❌ | — | Comma-sep allowlist of categories. Biggest token saver. |
 | `GD_DISABLE` | ❌ | — | Comma-sep denylist. Ignored when `GD_TOOLS` is set. |
 | `MCP_TRANSPORT` | ❌ | `stdio` | `http` to enable Streamable HTTP transport |
@@ -258,7 +257,7 @@ Built on [`@us-all/mcp-toolkit`](https://github.com/us-all/mcp-toolkit):
 
 ## Tech stack
 
-Node.js 18+ • TypeScript strict ESM • pnpm • `@modelcontextprotocol/sdk` • `googleapis` (Drive v3 / Docs v1 / Sheets v4 / Slides v1 / Activity v2 / Labels v2) • zod • dotenv • vitest.
+Node.js 22+ • TypeScript strict ESM • pnpm • `@modelcontextprotocol/sdk` • `googleapis` (Drive v3 / Docs v1 / Sheets v4 / Slides v1 / Activity v2 / Labels v2) • zod • dotenv • vitest.
 
 ## Limitations
 
