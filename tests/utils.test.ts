@@ -5,6 +5,7 @@ import {
   assertWriteAllowed,
   requireGWS,
   wrapToolHandler,
+  enrichGoogleApiError,
 } from "../src/tools/utils.js";
 import type { AccountCapabilities } from "../src/capabilities.js";
 
@@ -106,5 +107,90 @@ describe("wrapToolHandler", () => {
     const result = await handler({} as never);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Unknown error");
+  });
+});
+
+describe("enrichGoogleApiError (SA + DWD hint)", () => {
+  const oauthCtx = { authMethod: "oauth2", impersonateUser: "" };
+  const saWithImpersonate = {
+    authMethod: "service-account",
+    impersonateUser: "alice@example.com",
+  };
+  const saNoImpersonate = {
+    authMethod: "service-account",
+    impersonateUser: "",
+  };
+
+  function gErr(opts: {
+    message: string;
+    code?: number;
+    responseData?: unknown;
+  }): Error & { code?: number; response?: { data?: unknown } } {
+    const e = new Error(opts.message) as Error & {
+      code?: number;
+      response?: { data?: unknown };
+    };
+    if (opts.code !== undefined) e.code = opts.code;
+    if (opts.responseData !== undefined) e.response = { data: opts.responseData };
+    return e;
+  }
+
+  it("does not add hint for OAuth2 (no impersonation context)", () => {
+    const data = enrichGoogleApiError(gErr({ message: "Forbidden", code: 403 }), oauthCtx);
+    expect(data.hint).toBeUndefined();
+    expect(data.status).toBe(403);
+  });
+
+  it("does not add hint for SA without impersonation", () => {
+    const data = enrichGoogleApiError(
+      gErr({ message: "Forbidden", code: 403 }),
+      saNoImpersonate,
+    );
+    expect(data.hint).toBeUndefined();
+  });
+
+  it("adds DWD hint on 401 while impersonating", () => {
+    const data = enrichGoogleApiError(
+      gErr({ message: "Unauthorized", code: 401 }),
+      saWithImpersonate,
+    );
+    expect(data.hint).toMatch(/Domain-wide Delegation/);
+    expect(data.hint).toContain("alice@example.com");
+  });
+
+  it("adds DWD hint when error body reports unauthorized_client", () => {
+    const data = enrichGoogleApiError(
+      gErr({
+        message: "Bad Request",
+        responseData: { error: "unauthorized_client", error_description: "Client is unauthorized" },
+      }),
+      saWithImpersonate,
+    );
+    expect(data.hint).toMatch(/Domain-wide Delegation/);
+  });
+
+  it("adds permission hint on 403 while impersonating", () => {
+    const data = enrichGoogleApiError(
+      gErr({
+        message: "The user does not have sufficient permissions for this file.",
+        code: 403,
+      }),
+      saWithImpersonate,
+    );
+    expect(data.hint).toMatch(/Permission denied/);
+    expect(data.hint).toContain("alice@example.com");
+  });
+
+  it("preserves status, errors, and details fields", () => {
+    const data = enrichGoogleApiError(
+      gErr({
+        message: "Forbidden",
+        code: 403,
+        responseData: { error: { message: "perm" } },
+      }),
+      saWithImpersonate,
+    );
+    expect(data.status).toBe(403);
+    expect(data.details).toEqual({ error: { message: "perm" } });
   });
 });

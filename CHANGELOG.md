@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.5] - 2026-05-30
+
+### Changed
+
+- **SA + DWD failure mode now self-documenting.** When the server runs under a service account with `GOOGLE_IMPERSONATE_USER` set and a Google API call fails with 401, 403, or an `unauthorized_client`/`invalid_grant`/`invalid subject` body, the structured error response now includes a `hint` field telling the operator either (a) DWD is likely not authorized for the required scopes in Admin → Security → API controls → Domain-wide Delegation, or (b) the impersonated user lacks direct access to the resource. Previously, both modes surfaced as a generic `permission denied` and operators had to bisect by hand.
+- Pure helper `enrichGoogleApiError(err, ctx)` extracted from the `wrapToolHandler` error path so the hint logic is unit-testable without driving the singleton config. 6 new cases (84 → 90 tests).
+
+(No public schema change; `message`, `status`, `errors`, `details` preserved. Only the `hint` field is new and only appears when impersonation is the active auth mode.)
+
 ## [1.7.0] - 2026-05-01
 
 ### Added
