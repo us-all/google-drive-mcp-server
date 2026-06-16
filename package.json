@@ -1,8 +1,8 @@
 {
   "name": "@us-all/google-drive-mcp",
-  "version": "1.15.5",
+  "version": "1.15.6",
   "mcpName": "io.github.us-all/google-drive",
-  "description": "Google Drive MCP server with Google Workspace awareness \u2014 Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
+  "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -40,9 +40,11 @@
   "packageManager": "pnpm@10.30.2",
   "pnpm": {
     "overrides": {
-      "hono": "^4.12.18",
+      "hono": "^4.12.21",
       "fast-uri": "^3.1.2",
-      "ip-address": "^10.1.1"
+      "ip-address": "^10.1.1",
+      "vite": "^8.0.16",
+      "launch-editor": "^2.14.1"
     }
   },
   "scripts": {
