@@ -1,6 +1,6 @@
 {
   "name": "@us-all/google-drive-mcp",
-  "version": "1.15.7",
+  "version": "1.15.8",
   "mcpName": "io.github.us-all/google-drive",
   "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
   "type": "module",
@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@us-all/mcp-toolkit": "^1.2.3",
+    "@us-all/mcp-toolkit": "^1.2.5",
     "dotenv": "^17.4.2",
     "googleapis": "^171.4.0",
     "zod": "^4.4.2"
