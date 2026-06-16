@@ -1,6 +1,6 @@
 {
   "name": "@us-all/google-drive-mcp",
-  "version": "1.15.6",
+  "version": "1.15.7",
   "mcpName": "io.github.us-all/google-drive",
   "description": "Google Drive MCP server with Google Workspace awareness — Docs, Sheets, Slides, Shared Drives, Labels, Approvals, and domain-wide delegation support",
   "type": "module",
@@ -42,9 +42,7 @@
     "overrides": {
       "hono": "^4.12.21",
       "fast-uri": "^3.1.2",
-      "ip-address": "^10.1.1",
-      "vite": "^8.0.16",
-      "launch-editor": "^2.14.1"
+      "ip-address": "^10.1.1"
     }
   },
   "scripts": {
@@ -68,6 +66,7 @@
   "devDependencies": {
     "@types/node": "^22.15.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.1",
+    "vite": "^8.0.16"
   }
 }
