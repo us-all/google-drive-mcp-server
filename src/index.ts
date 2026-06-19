@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { startMcpServer } from "@us-all/mcp-toolkit/runtime";
+import { inferToolAnnotations } from "@us-all/mcp-toolkit";
 import { validateConfig } from "./config.js";
 import { detectCapabilities } from "./capabilities.js";
 import { wrapToolHandler } from "./tools/utils.js";
@@ -192,10 +193,10 @@ const server = new McpServer({
 let currentCategory: Category = "drive";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function tool(name: string, description: string, schema: any, handler: any): void {
+function tool(name: string, description: string, schema: any, handler: any, annotations?: any): void {
   registry.register(name, description, currentCategory);
   if (registry.isEnabled(currentCategory)) {
-    server.tool(name, description, schema, handler);
+    server.tool(name, description, schema, inferToolAnnotations(name, annotations), handler);
   }
 }
 
@@ -492,6 +493,7 @@ tool(
   "Find and replace text across a sheet or entire spreadsheet. Supports regex. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   findReplaceSchema.shape,
   wrapToolHandler(findReplace),
+  { readOnlyHint: false }, // verb "find" defaults read-only, but this mutates
 );
 
 tool(
@@ -527,6 +529,7 @@ tool(
   "Auto-fit column widths or row heights to content. Requires GOOGLE_DRIVE_ALLOW_WRITE=true",
   autoResizeSchema.shape,
   wrapToolHandler(autoResize),
+  { readOnlyHint: false }, // verb "auto" defaults read-only, but this mutates
 );
 
 tool(
